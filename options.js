@@ -6,6 +6,7 @@ const modelSelect = document.getElementById('modelSelect');
 const promptListDiv = document.getElementById('promptList');
 const promptPreviewDiv = document.getElementById('promptPreview');
 const temperatureInput = document.getElementById('temperature'); // Temperature input
+const timeoutInput = document.getElementById('timeout'); // Timeout input
 const saveButton = document.getElementById('save');
 const statusDiv = document.getElementById('status');
 const historyListDiv = document.getElementById('historyList'); // History display area
@@ -167,9 +168,15 @@ function saveOptions() {
   const selectedPromptId = selectedPromptRadio ? selectedPromptRadio.value : null;
   const editedPromptText = promptPreviewDiv.value; // Get text from textarea
   const temperature = parseFloat(temperatureInput.value); // Get temperature value
+  const timeout = parseInt(timeoutInput.value, 10); // Get timeout value
+  const MIN_TIMEOUT = 5; // Minimum allowed timeout in seconds
 
   if (isNaN(temperature) || temperature < 0 || temperature > 2) {
       showStatus('Error: Temperature must be between 0 and 2.', 'red');
+      return;
+  }
+  if (isNaN(timeout) || timeout < MIN_TIMEOUT) {
+      showStatus(`Error: Timeout must be a number and at least ${MIN_TIMEOUT} seconds.`, 'red');
       return;
   }
   if (!selectedPromptId) {
@@ -199,6 +206,7 @@ function saveOptions() {
       selectedModel: selectedModel,
       selectedPromptId: selectedPromptId,
       temperature: temperature, // Save temperature
+      timeout: timeout, // Save timeout
       prompts: currentPrompts // Save the potentially modified prompts array
     },
     () => {
@@ -221,6 +229,7 @@ function restoreOptions() {
       selectedModel: "openai/gpt-3.5-turbo", // Default model
       selectedPromptId: DEFAULT_PROMPTS[0]?.id || null, // Default to first prompt ID
       temperature: 0.9, // Default temperature
+      timeout: 30, // Default timeout in seconds
       prompts: DEFAULT_PROMPTS // Load saved prompts or use default
     },
     (items) => {
@@ -236,6 +245,7 @@ function restoreOptions() {
        } else {
          apiKeyInput.value = items.openRouterApiKey;
          temperatureInput.value = items.temperature; // Restore temperature
+         timeoutInput.value = items.timeout; // Restore timeout
          currentPrompts = items.prompts; // Use saved or default prompts
 
          // Fetch models dynamically using the restored API key

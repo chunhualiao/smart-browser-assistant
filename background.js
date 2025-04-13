@@ -91,12 +91,19 @@ async function generateReply(selectedText, tabId) {
     // Add other parameters like max_tokens if needed
   };
 
-  // 3. Call OpenRouter API
+  // 3. Call OpenRouter API with timeout
   const startTime = performance.now(); // Record start time
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => {
+      console.log(`API request timed out after ${settings.timeout} seconds.`);
+      controller.abort();
+  }, settings.timeout * 1000); // Convert seconds to milliseconds
+
   try {
-    console.log(`Sending request to OpenRouter (Model: ${settings.selectedModel})...`);
+    console.log(`Sending request to OpenRouter (Model: ${settings.selectedModel}, Timeout: ${settings.timeout}s)...`);
     const response = await fetch(OPENROUTER_API_URL, {
       method: "POST",
+      signal: controller.signal, // Pass the abort signal
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${settings.apiKey}`,
@@ -106,6 +113,8 @@ async function generateReply(selectedText, tabId) {
       },
       body: JSON.stringify(requestBody)
     });
+
+    clearTimeout(timeoutId); // Clear the timeout if the request completes
 
     console.log("OpenRouter response status:", response.status);
     if (!response.ok) {
@@ -146,8 +155,14 @@ async function generateReply(selectedText, tabId) {
     }
 
   } catch (error) {
-    console.error("Error calling OpenRouter API:", error);
-    notifyUser(tabId, `API Call Failed: ${error.message}`, "error");
+    clearTimeout(timeoutId); // Ensure timeout is cleared on error too
+    if (error.name === 'AbortError') {
+        console.error("API request aborted due to timeout.");
+        notifyUser(tabId, `API request timed out after ${settings.timeout} seconds.`, "error");
+    } else {
+        console.error("Error calling OpenRouter API:", error);
+        notifyUser(tabId, `API Call Failed: ${error.message}`, "error");
+    }
   }
 }
 
@@ -181,26 +196,36 @@ async function addLogEntry(entry) {
 
 // Gets all required settings from storage
 async function getSettings() {
+  const MIN_TIMEOUT = 5; // Minimum allowed timeout in seconds
+  const DEFAULT_TIMEOUT = 30; // Default timeout
+
   return new Promise((resolve) => {
-    // Include 'temperature' in the keys to retrieve
-    chrome.storage.sync.get(['openRouterApiKey', 'selectedModel', 'selectedPromptId', 'prompts', 'temperature'], (items) => {
+    // Include 'temperature' and 'timeout' in the keys to retrieve
+    chrome.storage.sync.get(['openRouterApiKey', 'selectedModel', 'selectedPromptId', 'prompts', 'temperature', 'timeout'], (items) => {
       if (chrome.runtime.lastError) {
         console.error("Error getting settings from storage:", chrome.runtime.lastError);
         // Ensure all expected fields are returned, even on error (as null/default)
-        resolve({ apiKey: null, selectedModel: null, selectedPrompt: null, temperature: 0.9 }); // Default temp on error
+        resolve({ apiKey: null, selectedModel: null, selectedPrompt: null, temperature: 0.9, timeout: DEFAULT_TIMEOUT }); // Default temp/timeout on error
       } else {
         const prompts = items.prompts || DEFAULT_PROMPTS;
         const selectedPrompt = prompts.find(p => p.id === items.selectedPromptId) || prompts[0]; // Fallback
+
         // Validate temperature or use default
         const temperature = (typeof items.temperature === 'number' && items.temperature >= 0 && items.temperature <= 2)
                             ? items.temperature
                             : 0.9; // Default temperature if invalid or not set
 
+        // Validate timeout or use default
+        const timeout = (typeof items.timeout === 'number' && items.timeout >= MIN_TIMEOUT)
+                        ? items.timeout
+                        : DEFAULT_TIMEOUT; // Default timeout if invalid or not set
+
         resolve({
           apiKey: items.openRouterApiKey || null,
           selectedModel: items.selectedModel || "openai/gpt-3.5-turbo", // Fallback model
           selectedPrompt: selectedPrompt,
-          temperature: temperature // Use validated or default temperature
+          temperature: temperature, // Use validated or default temperature
+          timeout: timeout // Use validated or default timeout
         });
       }
     });

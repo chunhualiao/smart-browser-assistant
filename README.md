@@ -1,6 +1,6 @@
 # X Reply Assistant Chrome Extension (v0.2)
 
-This Chrome extension helps generate counter-arguments or critical analyses for **any selected text** on a webpage using the OpenRouter API. It adds a context menu item when you right-click on highlighted text. The generated response is copied to your clipboard.
+This Chrome extension helps generate counter-arguments or critical analyses for **any selected text** on a webpage using the OpenRouter API. It adds a context menu item when you right-click on highlighted text. The generated response is copied to your clipboard. It can be used as an AI assistant to generate responses on social media websites such as x.com . 
 
 ## Prerequisites
 
@@ -32,9 +32,10 @@ This Chrome extension helps generate counter-arguments or critical analyses for 
         *   Enter your **OpenRouter API Key**. The list of AI models will load dynamically once a valid key is entered (you might need to click out of the field).
         *   Select the desired **AI Model** from the dropdown.
         *   Adjust the **Temperature (Creativity)** setting (0=focused, 1+=creative).
+        *   Set the **API Timeout** in seconds (default 30, min 5). This is the maximum time the extension will wait for a response from the API before showing an error.
         *   Choose the **Active Prompt** you want the context menu to use.
         *   You can **edit the text** of the selected prompt directly in the text area below the prompt list.
-    *   Click the "Save Settings" button to save the API key, selected model, temperature, and any prompt edits. You should see a confirmation message.
+    *   Click the "Save Settings" button to save the API key, selected model, temperature, timeout, and any prompt edits. You should see a confirmation message.
 
 ## Deployment to Marketplaces (e.g., Chrome Web Store)
 
@@ -82,7 +83,8 @@ Once the extension is published on a browser marketplace like the Chrome Web Sto
 ## Features
 
 *   Adds a "Generate Counter-Argument" option to the right-click context menu when text is selected.
-*   Uses your configured OpenRouter API key, selected model, temperature, and chosen prompt to generate a reply.
+*   Uses your configured OpenRouter API key, selected model, temperature, timeout, and chosen prompt to generate a reply.
+*   Aborts the API request and shows an error if the response takes longer than the configured timeout.
 *   Copies the generated reply directly to your clipboard.
 *   Allows editing of the prompt text within the options page.
 *   Dynamically loads available models from OpenRouter (requires valid API key).
@@ -96,8 +98,9 @@ Once the extension is published on a browser marketplace like the Chrome Web Sto
 3.  **Right-click** on the highlighted text.
 4.  Select "Generate Counter-Argument" (or similar, based on the menu title) from the context menu that appears.
 5.  The extension will send the selected text and your configured prompt/model to OpenRouter.
-6.  A notification should appear indicating the result has been **copied to your clipboard**.
-7.  Paste the result wherever you need it (e.g., a reply box, a document).
+6.  Wait up to 30 seconds until the OpenRouter API finishes process your prompt and the remote AI model responds.
+7.  A notification should then appear indicating the result has been **copied to your clipboard**.
+8.  Paste the result wherever you need it (e.g., a reply box, a document).
 
 ## Troubleshooting & Maintenance
 
