@@ -5,6 +5,7 @@ const apiKeyInput = document.getElementById('apiKey');
 const modelSelect = document.getElementById('modelSelect');
 const promptListDiv = document.getElementById('promptList');
 const promptPreviewDiv = document.getElementById('promptPreview');
+const temperatureInput = document.getElementById('temperature'); // Temperature input
 const saveButton = document.getElementById('save');
 const statusDiv = document.getElementById('status');
 const historyListDiv = document.getElementById('historyList'); // History display area
@@ -165,7 +166,12 @@ function saveOptions() {
   const selectedPromptRadio = document.querySelector('input[name="selectedPrompt"]:checked');
   const selectedPromptId = selectedPromptRadio ? selectedPromptRadio.value : null;
   const editedPromptText = promptPreviewDiv.value; // Get text from textarea
+  const temperature = parseFloat(temperatureInput.value); // Get temperature value
 
+  if (isNaN(temperature) || temperature < 0 || temperature > 2) {
+      showStatus('Error: Temperature must be between 0 and 2.', 'red');
+      return;
+  }
   if (!selectedPromptId) {
       showStatus('Error: No prompt selected.', 'red');
       return;
@@ -192,6 +198,7 @@ function saveOptions() {
       openRouterApiKey: apiKey,
       selectedModel: selectedModel,
       selectedPromptId: selectedPromptId,
+      temperature: temperature, // Save temperature
       prompts: currentPrompts // Save the potentially modified prompts array
     },
     () => {
@@ -213,6 +220,7 @@ function restoreOptions() {
       openRouterApiKey: '',
       selectedModel: "openai/gpt-3.5-turbo", // Default model
       selectedPromptId: DEFAULT_PROMPTS[0]?.id || null, // Default to first prompt ID
+      temperature: 0.9, // Default temperature
       prompts: DEFAULT_PROMPTS // Load saved prompts or use default
     },
     (items) => {
@@ -227,6 +235,7 @@ function restoreOptions() {
 
        } else {
          apiKeyInput.value = items.openRouterApiKey;
+         temperatureInput.value = items.temperature; // Restore temperature
          currentPrompts = items.prompts; // Use saved or default prompts
 
          // Fetch models dynamically using the restored API key

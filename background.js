@@ -87,7 +87,7 @@ async function generateReply(selectedText, tabId) {
       { role: "system", content: "You are an AI assistant focused on critical analysis and counter-arguments." },
       { role: "user", content: userPrompt }
     ],
-    temperature: 0.9, // Increase temperature for more varied responses
+    temperature: settings.temperature, // Use temperature from settings
     // Add other parameters like max_tokens if needed
   };
 
@@ -183,17 +183,25 @@ async function addLogEntry(entry) {
 // Gets all required settings from storage
 async function getSettings() {
   return new Promise((resolve) => {
-    chrome.storage.sync.get(['openRouterApiKey', 'selectedModel', 'selectedPromptId', 'prompts'], (items) => {
+    // Include 'temperature' in the keys to retrieve
+    chrome.storage.sync.get(['openRouterApiKey', 'selectedModel', 'selectedPromptId', 'prompts', 'temperature'], (items) => {
       if (chrome.runtime.lastError) {
         console.error("Error getting settings from storage:", chrome.runtime.lastError);
-        resolve({ apiKey: null, selectedModel: null, selectedPrompt: null });
+        // Ensure all expected fields are returned, even on error (as null/default)
+        resolve({ apiKey: null, selectedModel: null, selectedPrompt: null, temperature: 0.9 }); // Default temp on error
       } else {
         const prompts = items.prompts || DEFAULT_PROMPTS;
         const selectedPrompt = prompts.find(p => p.id === items.selectedPromptId) || prompts[0]; // Fallback
+        // Validate temperature or use default
+        const temperature = (typeof items.temperature === 'number' && items.temperature >= 0 && items.temperature <= 2)
+                            ? items.temperature
+                            : 0.9; // Default temperature if invalid or not set
+
         resolve({
           apiKey: items.openRouterApiKey || null,
           selectedModel: items.selectedModel || "openai/gpt-3.5-turbo", // Fallback model
-          selectedPrompt: selectedPrompt
+          selectedPrompt: selectedPrompt,
+          temperature: temperature // Use validated or default temperature
         });
       }
     });
