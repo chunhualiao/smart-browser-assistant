@@ -7,7 +7,8 @@
     "contextMenus",
     "storage",
     "scripting",
-    "activeTab"
+    "activeTab",
+    "clipboardWrite" 
   ],
   "host_permissions": [
     "*://*.x.com/*",
@@ -18,7 +19,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.x.com/*"],
+      "matches": ["<all_urls>"], 
       "js": ["content.js"]
     }
   ],
