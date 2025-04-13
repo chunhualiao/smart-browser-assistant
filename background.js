@@ -7,9 +7,9 @@ const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 // Default prompts - these will be loaded/saved from storage later
 const DEFAULT_PROMPTS = [
-  { id: "prompt1", name: "Constitutional Counter-Argument", text: "Critically analyze the following text based on US Constitutional principles and generate a concise counter-argument:\n\n\"%TEXT%\"" },
-  { id: "prompt2", name: "Logical Fallacy Check", text: "Identify any logical fallacies in the following text and explain them briefly:\n\n\"%TEXT%\"" },
-  { id: "prompt3", name: "Alternative Perspective", text: "Provide a concise alternative perspective to the argument presented in the following text:\n\n\"%TEXT%\"" }
+  { id: "prompt1", name: "Constitutional Counter-Argument", text: "Critically analyze the following text based on US Constitutional principles. Generate a concise counter-argument (under 280 characters):\n\n\"%TEXT%\"" },
+  { id: "prompt2", name: "Logical Fallacy Check", text: "Identify any logical fallacies in the following text and explain them very briefly (under 280 characters total):\n\n\"%TEXT%\"" },
+  { id: "prompt3", name: "Alternative Perspective", text: "Provide a concise alternative perspective (under 280 characters) to the argument presented in the following text:\n\n\"%TEXT%\"" }
 ];
 
 // --- Initialization ---
