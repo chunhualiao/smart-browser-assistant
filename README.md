@@ -1,6 +1,6 @@
 # Smart Browser Assistant Chrome Extension (v0.2)
 
-This Chrome extension helps generate counter-arguments or critical analyses for **any selected text** on a webpage using the OpenRouter API. It adds a context menu item when you right-click on highlighted text. The generated response is copied to your clipboard. It can be used as an AI assistant to generate responses on social media websites such as x.com . 
+This Chrome extension acts as an AI assistant for **any selected text** on a webpage using the OpenRouter API. It adds a context menu item when you right-click on highlighted text, allowing you to perform various actions like generating replies, proofreading, translating, or performing critical analysis. The generated response is copied to your clipboard. It's useful for tasks like drafting social media responses, improving writing, or understanding text from different perspectives.
 
 ## Prerequisites
 
@@ -82,11 +82,15 @@ Once the extension is published on a browser marketplace like the Chrome Web Sto
 
 ## Features
 
-*   Adds a "Generate Counter-Argument" option to the right-click context menu when text is selected.
-*   Uses your configured OpenRouter API key, selected model, temperature, timeout, and chosen prompt to generate a reply.
+*   Adds a customizable action to the right-click context menu when text is selected.
+*   Uses your configured OpenRouter API key, selected model, temperature, timeout, and chosen prompt to generate a response based on the selected text.
 *   Aborts the API request and shows an error if the response takes longer than the configured timeout.
-*   Copies the generated reply directly to your clipboard.
-*   Comes with a set of default prompts focused on constitutional analysis and critical thinking (e.g., Analyze via Specific Amendment, Identify Assumptions, Evaluate Evidence, Generate Counter-Argument, Explore Implications, Custom Students/Einstein Analogy).
+*   Copies the generated response directly to your clipboard.
+*   Comes with a set of default prompts for various tasks:
+    *   **Generate Reply:** Automatically draft a reply to the selected text.
+    *   **Proofread Text:** Check the selected text for grammar, spelling, and clarity.
+    *   **Translate to Chinese (Simplified):** Translate the selected text into Simplified Chinese.
+    *   **Critical Analysis:** Prompts focused on constitutional analysis and critical thinking (e.g., Analyze via Specific Amendment, Identify Assumptions, Evaluate Evidence, Generate Counter-Argument, Explore Implications, Custom Students/Einstein Analogy).
 *   Allows editing of any prompt text within the options page.
 *   Dynamically loads available models from OpenRouter (requires valid API key).
 *   Logs generation history (timestamp, model, duration, input, output) locally.
@@ -94,12 +98,12 @@ Once the extension is published on a browser marketplace like the Chrome Web Sto
 
 ## How to Use
 
-1.  Navigate to any webpage containing text you want to analyze.
+1.  Navigate to any webpage containing text you want to interact with.
 2.  **Select (highlight) the text** with your mouse.
 3.  **Right-click** on the highlighted text.
-4.  Select "Generate Counter-Argument" (or similar, based on the menu title) from the context menu that appears.
+4.  Select the action corresponding to your currently active prompt (e.g., "Generate Reply", "Proofread Text", "Analyze via Specific Amendment") from the context menu. The menu item text reflects the *name* of the active prompt set in the options.
 5.  The extension will send the selected text and your configured prompt/model to OpenRouter.
-6.  Wait up to 30 seconds until the OpenRouter API finishes process your prompt and the remote AI model responds.
+6.  Wait for the API to process the request (up to the configured timeout).
 7.  A notification should then appear indicating the result has been **copied to your clipboard**.
 8.  Paste the result wherever you need it (e.g., a reply box, a document).
 
