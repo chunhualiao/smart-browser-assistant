@@ -118,7 +118,17 @@ async function generateReply(selectedText, tabId) {
 
     if (resultText) {
       console.log("Generated result:", resultText);
-      // 4. Copy result to clipboard (pass tabId)
+
+      // 4. Log the successful generation
+      const logEntry = {
+        timestamp: new Date().toISOString(),
+        model: settings.selectedModel,
+        input: selectedText,
+        output: resultText
+      };
+      await addLogEntry(logEntry);
+
+      // 5. Copy result to clipboard (pass tabId)
       await copyToClipboard(resultText, tabId);
       // Notification is now handled within copyToClipboard on success/failure
 
@@ -134,6 +144,29 @@ async function generateReply(selectedText, tabId) {
 }
 
 // --- Helper Functions ---
+
+// Add entry to the log history in local storage
+async function addLogEntry(entry) {
+  try {
+    const result = await chrome.storage.local.get({ history: [] }); // Default to empty array
+    let history = result.history;
+
+    // Add new entry to the beginning
+    history.unshift(entry);
+
+    // Limit history size (e.g., 100 entries)
+    const MAX_HISTORY_SIZE = 100;
+    if (history.length > MAX_HISTORY_SIZE) {
+      history = history.slice(0, MAX_HISTORY_SIZE);
+    }
+
+    await chrome.storage.local.set({ history: history });
+    console.log("Log entry added. History size:", history.length);
+  } catch (error) {
+    console.error("Error saving log entry:", error);
+  }
+}
+
 
 // Gets all required settings from storage
 async function getSettings() {

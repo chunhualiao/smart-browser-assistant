@@ -7,6 +7,8 @@ const promptListDiv = document.getElementById('promptList');
 const promptPreviewDiv = document.getElementById('promptPreview');
 const saveButton = document.getElementById('save');
 const statusDiv = document.getElementById('status');
+const historyListDiv = document.getElementById('historyList'); // History display area
+const clearHistoryButton = document.getElementById('clearHistory'); // Clear history button
 const OPENROUTER_MODELS_URL = "https://openrouter.ai/api/v1/models"; // API endpoint for models
 
 // --- Default/Predefined Data ---
@@ -249,11 +251,75 @@ function showStatus(message, color = 'black') {
     }, 2500); // Clear status after 2.5 seconds
 }
 
+// Display history entries
+function displayHistory(history) {
+    historyListDiv.innerHTML = ''; // Clear loading message or previous content
+
+    if (!history || history.length === 0) {
+        historyListDiv.innerHTML = '<p>No history yet.</p>';
+        return;
+    }
+
+    history.forEach(entry => {
+        const entryDiv = document.createElement('div');
+        entryDiv.style.borderBottom = '1px solid #eee';
+        entryDiv.style.marginBottom = '10px';
+        entryDiv.style.paddingBottom = '10px';
+
+        const time = new Date(entry.timestamp).toLocaleString();
+        const model = entry.model || 'N/A'; // Handle potential missing data
+
+        // Truncate long input/output for display
+        const maxLen = 150;
+        const inputShort = entry.input.length > maxLen ? entry.input.substring(0, maxLen) + '...' : entry.input;
+        const outputShort = entry.output.length > maxLen ? entry.output.substring(0, maxLen) + '...' : entry.output;
+
+        entryDiv.innerHTML = `
+            <p style="margin: 2px 0;"><small><strong>Time:</strong> ${time}</small></p>
+            <p style="margin: 2px 0;"><small><strong>Model:</strong> ${model}</small></p>
+            <p style="margin: 2px 0; white-space: pre-wrap; word-wrap: break-word;"><strong>Input:</strong> ${inputShort}</p>
+            <p style="margin: 2px 0; white-space: pre-wrap; word-wrap: break-word;"><strong>Output:</strong> ${outputShort}</p>
+        `;
+        // Add full text in a title attribute for hover?
+        entryDiv.title = `Input:\n${entry.input}\n\nOutput:\n${entry.output}`;
+
+        historyListDiv.appendChild(entryDiv);
+    });
+}
+
+// Clear history from storage and update display
+async function clearHistory() {
+    if (!confirm("Are you sure you want to clear the entire generation history? This cannot be undone.")) {
+        return;
+    }
+    try {
+        await chrome.storage.local.set({ history: [] });
+        console.log("History cleared from storage.");
+        displayHistory([]); // Update the UI immediately
+        showStatus('History cleared.', 'green');
+    } catch (error) {
+        console.error("Error clearing history:", error);
+        showStatus('Error clearing history.', 'red');
+    }
+}
+
 
 // --- Event Listeners ---
 
-document.addEventListener('DOMContentLoaded', restoreOptions);
+document.addEventListener('DOMContentLoaded', () => {
+    restoreOptions();
+    // Also load and display history on initial load
+    chrome.storage.local.get({ history: [] }, (result) => {
+        if (chrome.runtime.lastError) {
+            console.error("Error loading history:", chrome.runtime.lastError);
+            historyListDiv.innerHTML = '<p>Error loading history.</p>';
+        } else {
+            displayHistory(result.history);
+        }
+    });
+});
 saveButton.addEventListener('click', saveOptions);
+clearHistoryButton.addEventListener('click', clearHistory); // Add listener for clear button
 
 // Add listener to API key input to refresh models on change
 apiKeyInput.addEventListener('change', (event) => {
