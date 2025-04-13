@@ -1,4 +1,15 @@
-## Feature set v 1.0
+## MVP
+
+tag as v 1.0
+
+Done
+
+publish to extension market, 
+
+Then deploy it
+
+
+## Feature set v 1.1
 
 * persuasive response using best psychological methods
 
@@ -15,7 +26,6 @@ monetize it : collect sponsorship?
 
 how to add regression tests with github? so commit to only a feature or bug fix branch, automatically test and merge to main only if the tests pass?
 
-## deploy it
 
 
 ## Version 2 features
@@ -40,6 +50,6 @@ multiple types of browser
     *   Review if the `*://*.x.com/*` host permission is necessary and remove/narrow it.
     *   Evaluate if the content script `matches` can be narrowed from `<all_urls>`.
     *   Update the `description` field to be more general and accurately reflect functionality.
-*   **Code Duplication (`DEFAULT_PROMPTS`):** Consider defining shared constants in a separate utility file (`constants.js` or similar) to avoid duplication between `background.js` and `options.js`.
+*   **[DONE] Code Duplication (`DEFAULT_PROMPTS`):** Defined shared constants in `constants.js` to avoid duplication between `background.js` and `options.js`.
 *   **Constants Definition:** Define constants like `MIN_TIMEOUT` and `MAX_HISTORY_SIZE` globally at the top of files or in a shared constants file.
 *   **Notifications (`background.js`):** Consider switching from `alert()` to `chrome.notifications.create()` for user notifications for a better UX.
