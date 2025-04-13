@@ -89,9 +89,10 @@ function populatePromptList(prompts, selectedPromptId) {
    }
 }
 
-// Update Prompt Preview Area
+// Update Prompt Preview Area (now a textarea)
 function updatePromptPreview(promptText) {
-  promptPreviewDiv.textContent = promptText || "Error loading prompt text.";
+  // promptPreviewDiv is now a textarea, so set its value
+  promptPreviewDiv.value = promptText || "Error loading prompt text.";
 }
 
 // Saves all options to chrome.storage.sync
@@ -100,6 +101,7 @@ function saveOptions() {
   const selectedModel = modelSelect.value;
   const selectedPromptRadio = document.querySelector('input[name="selectedPrompt"]:checked');
   const selectedPromptId = selectedPromptRadio ? selectedPromptRadio.value : null;
+  const editedPromptText = promptPreviewDiv.value; // Get text from textarea
 
   if (!selectedPromptId) {
       showStatus('Error: No prompt selected.', 'red');
@@ -110,14 +112,24 @@ function saveOptions() {
       return;
   }
 
+  // Find the prompt in the currentPrompts array and update its text
+  const promptIndex = currentPrompts.findIndex(p => p.id === selectedPromptId);
+  if (promptIndex !== -1) {
+      currentPrompts[promptIndex].text = editedPromptText;
+      console.log(`Updated prompt text for ID: ${selectedPromptId}`);
+  } else {
+      console.error(`Could not find prompt with ID ${selectedPromptId} to update text.`);
+      showStatus('Error finding prompt to update.', 'red');
+      return; // Don't save if we couldn't find the prompt
+  }
+
+  // Save the updated prompts array along with other settings
   chrome.storage.sync.set(
     {
       openRouterApiKey: apiKey,
       selectedModel: selectedModel,
       selectedPromptId: selectedPromptId,
-      // Note: We are not saving the prompts themselves here, assuming they are relatively static
-      // or managed elsewhere if customization is added later. If prompts become editable,
-      // we'd need to save the `currentPrompts` array too.
+      prompts: currentPrompts // Save the potentially modified prompts array
     },
     () => {
       if (chrome.runtime.lastError) {
