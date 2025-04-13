@@ -118,9 +118,9 @@ async function generateReply(selectedText, tabId) {
 
     if (resultText) {
       console.log("Generated result:", resultText);
-      // 4. Copy result to clipboard
-      await copyToClipboard(resultText);
-      notifyUser(tabId, "Counter-argument copied to clipboard!", "success");
+      // 4. Copy result to clipboard (pass tabId)
+      await copyToClipboard(resultText, tabId);
+      // Notification is now handled within copyToClipboard on success/failure
 
     } else {
       console.error("No result text found in API response.");
@@ -155,31 +155,38 @@ async function getSettings() {
   });
 }
 
-// Copies text to the clipboard
-async function copyToClipboard(text) {
+// Copies text to the clipboard by injecting a script into the target tab
+async function copyToClipboard(text, tabId) {
+  if (!tabId) {
+    console.error("Cannot copy to clipboard: tabId is missing.");
+    // Optionally notify the user via other means if possible
+    return;
+  }
   try {
-    // Use the modern clipboard API if available (requires HTTPS context or extension)
-    await navigator.clipboard.writeText(text);
-    console.log("Text copied to clipboard.");
-  } catch (err) {
-    // Fallback for older contexts or if the API fails
-    console.warn("navigator.clipboard.writeText failed, attempting fallback:", err);
-    try {
-        // Create a temporary textarea element
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        textArea.style.position = "absolute";
-        textArea.style.left = "-9999px"; // Move off-screen
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textArea);
-        console.log("Fallback copy successful.");
-    } catch (fallbackErr) {
-        console.error("Fallback clipboard copy failed:", fallbackErr);
-        // Cannot copy automatically, maybe notify user to copy manually?
-        throw new Error("Failed to copy text to clipboard."); // Re-throw or handle differently
-    }
+    await chrome.scripting.executeScript({
+      target: { tabId: tabId },
+      func: async (textToCopy) => {
+        try {
+          await navigator.clipboard.writeText(textToCopy);
+          // Optionally, could send a message back to background if confirmation is needed
+          // Or show a brief visual confirmation on the page itself
+        } catch (err) {
+          console.error('Failed to copy text in content script:', err);
+          // Rethrow or handle the error in the content script context if needed
+          // Maybe alert the user from here? alert('Failed to copy text.');
+          throw err; // Propagate error back to background script's catch block
+        }
+      },
+      args: [text]
+    });
+    console.log("Clipboard write command sent to tab:", tabId);
+    // Notify success *after* the script executes successfully
+    notifyUser(tabId, "Counter-argument copied to clipboard!", "success");
+
+  } catch (error) {
+    console.error("Failed to execute clipboard script or copy failed in tab:", error);
+    // Notify failure
+    notifyUser(tabId, `Failed to copy to clipboard: ${error.message}`, "error");
   }
 }
 
