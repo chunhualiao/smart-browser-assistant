@@ -112,6 +112,21 @@ The majority of the code in this project was generated using AI assistance, spec
 
 The author provided guidance for feature additions, refinements, and bug fixes throughout the development process.
 
+## Security Review (April 13, 2025)
+
+A security review of the codebase was performed with the following findings:
+
+*   **API Key Handling**: The OpenRouter API key appears to be handled securely.
+    *   Stored using `chrome.storage.sync`.
+    *   Masked in the options page UI (`<input type="password">`).
+    *   Transmitted securely over HTTPS within the `Authorization` header.
+    *   Not logged in the console or stored in the generation history.
+*   **Permissions (`manifest.json`)**: Permissions requested are generally necessary. The `*://*.x.com/*` host permission and the `<all_urls>` content script match could potentially be narrowed depending on the extension's intended scope, but do not currently lead to data leaks.
+*   **Logging (`background.js`)**: The background script logs the full response body from the OpenRouter API. While this doesn't leak the API key itself, logging raw API responses is generally discouraged. Recommendation: Modify logging to only include necessary, non-sensitive fields.
+*   **Other Scripts (`options.js`, `content.js`)**: These scripts do not appear to handle or expose sensitive information insecurely.
+
+**Overall**: No direct vectors for leaking the API key or other sensitive user information were identified.
+
 ## Troubleshooting & Maintenance
 
 *   **Context Menu Not Appearing:** Ensure you are right-clicking *directly on the text you have selected*. Make sure the extension is enabled in `chrome://extensions/`.
