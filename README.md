@@ -82,8 +82,11 @@ Once the extension is published on a browser marketplace like the Chrome Web Sto
 
 ## Features
 
-*   Adds a customizable action to the right-click context menu when text is selected.
-*   Uses your configured OpenRouter API key, selected model, temperature, timeout, and chosen prompt to generate a response based on the selected text.
+*   Adds a **two-level context menu** when right-clicking selected text:
+    *   Top Level: "Smart Browser Assistant"
+    *   Second Level: Lists all available prompts (from defaults or user edits).
+*   Uses your configured OpenRouter API key, selected model, temperature, and timeout settings for all prompts.
+*   Generates a response based on the selected text and the **specific prompt clicked** in the context menu.
 *   Aborts the API request and shows an error if the response takes longer than the configured timeout.
 *   Copies the generated response directly to your clipboard.
 *   Comes with a set of default prompts for various tasks:
@@ -101,9 +104,11 @@ Once the extension is published on a browser marketplace like the Chrome Web Sto
 1.  Navigate to any webpage containing text you want to interact with.
 2.  **Select (highlight) the text** with your mouse.
 3.  **Right-click** on the highlighted text.
-4.  Select the action corresponding to your currently active prompt (e.g., "Generate Reply", "Proofread Text", "Analyze via Specific Amendment") from the context menu. The menu item text reflects the *name* of the active prompt set in the options.
-5.  The extension will send the selected text and your configured prompt/model to OpenRouter.
-6.  Wait for the API to process the request (up to the configured timeout).
+4.  Hover over the **"Smart Browser Assistant"** item in the context menu.
+5.  A sub-menu will appear listing all available prompts (e.g., "Generate Reply", "Proofread Text", "Analyze via Specific Amendment").
+6.  **Click the specific prompt** you want to use for the selected text.
+7.  The extension will send the selected text and the chosen prompt (using your configured model and settings) to OpenRouter.
+8.  Wait for the API to process the request (up to the configured timeout).
 7.  A notification should then appear indicating the result has been **copied to your clipboard**.
 8.  Paste the result wherever you need it (e.g., a reply box, a document).
 

@@ -2,48 +2,110 @@
 
 import { DEFAULT_PROMPTS } from './constants.js';
 
-const CONTEXT_MENU_ID = "generateReplyX";
+const PARENT_MENU_ID = "smartAssistantParent";
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
+
+// --- Context Menu Management ---
+
+// Function to build/update the context menu
+async function updateContextMenu(prompts) {
+  await chrome.contextMenus.removeAll(); // Clear existing menus first
+
+  chrome.contextMenus.create({
+    id: PARENT_MENU_ID,
+    title: "Smart Browser Assistant",
+    contexts: ["selection"]
+  });
+
+  if (prompts && prompts.length > 0) {
+    prompts.forEach(prompt => {
+      chrome.contextMenus.create({
+        id: prompt.id, // Use prompt's unique ID
+        parentId: PARENT_MENU_ID,
+        title: prompt.name, // Use prompt's name
+        contexts: ["selection"]
+      });
+    });
+  } else {
+    // Optionally create a placeholder if no prompts exist
+    chrome.contextMenus.create({
+        id: "noPromptsAvailable",
+        parentId: PARENT_MENU_ID,
+        title: "(No prompts configured)",
+        contexts: ["selection"],
+        enabled: false
+      });
+  }
+  console.log("Smart Browser Assistant context menu updated.");
+}
 
 // --- Initialization ---
 
-// Create context menu item on installation
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.contextMenus.create({
-    id: CONTEXT_MENU_ID,
-    title: "Generate Counter-Argument", // Updated title
-    contexts: ["selection"] // Show only when text is selected
-  });
-  console.log("Smart Browser Assistant context menu created for selection.");
+// Create context menu on installation/update
+chrome.runtime.onInstalled.addListener(async (details) => {
+  // Initialize storage with defaults if not already set
+  const items = await chrome.storage.sync.get(['prompts', 'selectedPromptId', 'selectedModel']);
+  const initialPrompts = items.prompts || DEFAULT_PROMPTS;
 
-  // Initialize storage with default prompts if not already set
-  chrome.storage.sync.get(['prompts', 'selectedPromptId', 'selectedModel'], (items) => {
-    if (!items.prompts) {
-      chrome.storage.sync.set({ prompts: DEFAULT_PROMPTS });
-      console.log("Initialized default prompts in storage.");
-    }
-    if (!items.selectedPromptId) {
-      chrome.storage.sync.set({ selectedPromptId: DEFAULT_PROMPTS[0].id }); // Default to first prompt
-    }
-    if (!items.selectedModel) {
-      chrome.storage.sync.set({ selectedModel: "openai/gpt-3.5-turbo" }); // Default model
-    }
-  });
+  const storageUpdates = {};
+  if (!items.prompts) {
+    storageUpdates.prompts = DEFAULT_PROMPTS;
+    console.log("Initialized default prompts in storage.");
+  }
+  if (!items.selectedPromptId) {
+    storageUpdates.selectedPromptId = DEFAULT_PROMPTS[0]?.id || null; // Default to first prompt ID
+  }
+  if (!items.selectedModel) {
+    storageUpdates.selectedModel = "openai/gpt-3.5-turbo"; // Default model
+  }
+  // Also ensure temperature and timeout have defaults if not set
+  if (items.temperature === undefined) storageUpdates.temperature = 0.9;
+  if (items.timeout === undefined) storageUpdates.timeout = 30;
+  if (items.verboseLoggingEnabled === undefined) storageUpdates.verboseLoggingEnabled = false;
+
+
+  if (Object.keys(storageUpdates).length > 0) {
+    await chrome.storage.sync.set(storageUpdates);
+    console.log("Applied initial/default settings.");
+  }
+
+  // Build the initial context menu
+  await updateContextMenu(initialPrompts);
 });
 
 // --- Event Listeners ---
 
 // Listen for context menu clicks
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === CONTEXT_MENU_ID && info.selectionText) {
-    console.log("Context menu clicked with selected text:", info.selectionText);
-    generateReply(info.selectionText, tab?.id); // Pass tabId for potential notifications
-  } else {
-      console.log("Context menu clicked, but no text selected or other issue.");
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  // Check if the click is on one of our prompt sub-menus and text is selected
+  if (info.parentMenuItemId === PARENT_MENU_ID && info.menuItemId !== "noPromptsAvailable" && info.selectionText) {
+    console.log(`Context sub-menu clicked: ${info.menuItemId} with text:`, info.selectionText);
+
+    // Get the specific prompt object that was clicked
+    const { prompts } = await chrome.storage.sync.get('prompts');
+    const clickedPrompt = (prompts || DEFAULT_PROMPTS).find(p => p.id === info.menuItemId);
+
+    if (clickedPrompt) {
+      generateReply(info.selectionText, tab?.id, clickedPrompt); // Pass the specific prompt
+    } else {
+      console.error(`Clicked prompt with ID ${info.menuItemId} not found in storage.`);
+      notifyUser(tab?.id, `Error: Clicked prompt (ID: ${info.menuItemId}) not found.`, "error");
+    }
+  } else if (info.parentMenuItemId === PARENT_MENU_ID) {
+      console.log("Context sub-menu clicked, but no text selected or item was disabled.");
   }
 });
 
-// Listen for messages (e.g., from options page or content script if needed later)
+// Listen for storage changes to update the context menu dynamically
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === 'sync' && changes.prompts) {
+    console.log("Prompts changed in storage, updating context menu...");
+    updateContextMenu(changes.prompts.newValue);
+  }
+});
+
+
+// Listen for messages (e.g., from options page)
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log("Received message:", message);
   // Example: Handle potential messages if needed
@@ -54,27 +116,29 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // --- Core Logic ---
 
-async function generateReply(selectedText, tabId) {
-  console.log("Attempting to generate reply for selected text:", selectedText);
+// Modified to accept the specific prompt object to use
+async function generateReply(selectedText, tabId, clickedPrompt) {
+  console.log(`Attempting to generate reply using prompt "${clickedPrompt.name}" for text:`, selectedText);
 
-  // 1. Get Settings (API Key, Model, Prompt)
-  const settings = await getSettings();
+  // 1. Get Settings (API Key, Model, Temp, Timeout etc. - *excluding* selectedPromptId)
+  const settings = await getSettings(); // getSettings now primarily fetches config *other* than the prompt itself
   if (!settings.apiKey) {
     console.error("OpenRouter API Key not found. Please set it in the extension options.");
     notifyUser(tabId, "API Key not set. Please configure it in extension options.", "error");
     return;
   }
-  if (!settings.selectedModel || !settings.selectedPrompt) {
-    console.error("Model or Prompt not configured. Please check extension options.");
-     notifyUser(tabId, "Model or Prompt not configured. Please check extension options.", "error");
-    return;
-  }
+   if (!settings.selectedModel) {
+     console.error("Model not configured. Please check extension options.");
+     notifyUser(tabId, "Model not configured. Please check extension options.", "error");
+     return;
+   }
+   // clickedPrompt is passed directly, so we don't need settings.selectedPrompt here
 
-  // 2. Prepare API Request using selected prompt
-  const userPrompt = settings.selectedPrompt.text.replace("%TEXT%", selectedText); // Inject selected text
+  // 2. Prepare API Request using the *clicked* prompt
+  const userPrompt = clickedPrompt.text.replace("%TEXT%", selectedText); // Inject selected text into the clicked prompt's text
 
   const requestBody = {
-    model: settings.selectedModel,
+    model: settings.selectedModel, // Use model from general settings
     messages: [
       // System prompt could also be part of the configurable prompt object
       { role: "system", content: "You are an AI assistant focused on critical analysis and counter-arguments." },
@@ -190,22 +254,37 @@ async function addLogEntry(entry) {
 }
 
 
-// Gets all required settings from storage
+// Gets general settings from storage (API Key, Model, Temp, Timeout, etc.)
+// Note: It still fetches selectedPromptId and prompts for potential use elsewhere (like options page),
+// but generateReply now relies on the passed 'clickedPrompt'.
 async function getSettings() {
   const MIN_TIMEOUT = 5; // Minimum allowed timeout in seconds
   const DEFAULT_TIMEOUT = 30; // Default timeout
 
   return new Promise((resolve) => {
-    // Include 'verboseLoggingEnabled' along with other keys
-    chrome.storage.sync.get(['openRouterApiKey', 'selectedModel', 'selectedPromptId', 'prompts', 'temperature', 'timeout', 'verboseLoggingEnabled'], (items) => {
+    // Fetch all settings, including those not directly used by generateReply via context menu anymore
+    chrome.storage.sync.get([
+        'openRouterApiKey',
+        'selectedModel',
+        'selectedPromptId', // Still needed for options page default selection
+        'prompts',          // Still needed for options page list
+        'temperature',
+        'timeout',
+        'verboseLoggingEnabled'
+      ], (items) => {
       if (chrome.runtime.lastError) {
         console.error("Error getting settings from storage:", chrome.runtime.lastError);
-        // Ensure all expected fields are returned, even on error (as null/default)
-        resolve({ apiKey: null, selectedModel: null, selectedPrompt: null, temperature: 0.9, timeout: DEFAULT_TIMEOUT, verboseLoggingEnabled: false }); // Default settings on error
+        // Provide defaults on error
+        resolve({
+            apiKey: null,
+            selectedModel: "openai/gpt-3.5-turbo", // Default model
+            selectedPromptId: null, // No specific prompt selected in this context
+            prompts: DEFAULT_PROMPTS, // Default prompts list
+            temperature: 0.9,
+            timeout: DEFAULT_TIMEOUT,
+            verboseLoggingEnabled: false
+        });
       } else {
-        const prompts = items.prompts || DEFAULT_PROMPTS;
-        const selectedPrompt = prompts.find(p => p.id === items.selectedPromptId) || prompts[0]; // Fallback
-
         // Validate temperature or use default
         const temperature = (typeof items.temperature === 'number' && items.temperature >= 0 && items.temperature <= 2)
                             ? items.temperature
@@ -219,10 +298,11 @@ async function getSettings() {
         resolve({
           apiKey: items.openRouterApiKey || null,
           selectedModel: items.selectedModel || "openai/gpt-3.5-turbo", // Fallback model
-          selectedPrompt: selectedPrompt,
-          temperature: temperature, // Use validated or default temperature
-          timeout: timeout, // Use validated or default timeout
-          verboseLoggingEnabled: items.verboseLoggingEnabled || false // Default to false if not set
+          selectedPromptId: items.selectedPromptId || DEFAULT_PROMPTS[0]?.id || null, // For options page
+          prompts: items.prompts || DEFAULT_PROMPTS, // For options page
+          temperature: temperature,
+          timeout: timeout,
+          verboseLoggingEnabled: items.verboseLoggingEnabled || false
         });
       }
     });
@@ -254,8 +334,8 @@ async function copyToClipboard(text, tabId) {
       args: [text]
     });
     console.log("Clipboard write command sent to tab:", tabId);
-    // Notify success *after* the script executes successfully
-    notifyUser(tabId, "Counter-argument copied to clipboard!", "success");
+      // Notify success *after* the script executes successfully
+    notifyUser(tabId, "Result copied to clipboard!", "success"); // More generic message
 
   } catch (error) {
     console.error("Failed to execute clipboard script or copy failed in tab:", error);
