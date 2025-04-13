@@ -155,9 +155,9 @@ async function generateReply(selectedText, tabId) {
     }
 
     const data = await response.json();
-    // Log the full response data for potential future debugging
-    console.log("Full API response data:", JSON.stringify(data, null, 2));
-    // console.log("OpenRouter response data:", data); // Can likely remove the less detailed log now
+    // Avoid logging full response data for security/privacy. Log only confirmation or specific fields if needed.
+    console.log("Received successful response from OpenRouter."); 
+    // console.log("OpenRouter response data:", data); // Example of logging specific field if needed: console.log("Response ID:", data.id);
 
     const resultText = data.choices?.[0]?.message?.content?.trim();
 
