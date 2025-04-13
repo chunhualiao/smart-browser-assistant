@@ -86,7 +86,8 @@ Once the extension is published on a browser marketplace like the Chrome Web Sto
 *   Uses your configured OpenRouter API key, selected model, temperature, timeout, and chosen prompt to generate a reply.
 *   Aborts the API request and shows an error if the response takes longer than the configured timeout.
 *   Copies the generated reply directly to your clipboard.
-*   Allows editing of the prompt text within the options page.
+*   Comes with a set of default prompts focused on constitutional analysis and critical thinking (e.g., Analyze via Specific Amendment, Identify Assumptions, Evaluate Evidence, Generate Counter-Argument, Explore Implications, Custom Students/Einstein Analogy).
+*   Allows editing of any prompt text within the options page.
 *   Dynamically loads available models from OpenRouter (requires valid API key).
 *   Logs generation history (timestamp, model, duration, input, output) locally.
 *   Provides an option to view and clear the generation history.
