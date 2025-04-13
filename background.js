@@ -87,7 +87,8 @@ async function generateReply(selectedText, tabId) {
       { role: "system", content: "You are an AI assistant focused on critical analysis and counter-arguments." },
       { role: "user", content: userPrompt }
     ],
-    // Add other parameters like temperature, max_tokens if needed
+    temperature: 0.9, // Increase temperature for more varied responses
+    // Add other parameters like max_tokens if needed
   };
 
   // 3. Call OpenRouter API
