@@ -17,12 +17,6 @@
     "service_worker": "background.js",
     "type": "module"
   },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"], 
-      "js": ["content.js"]
-    }
-  ],
   "options_ui": {
     "page": "options.html",
     "open_in_tab": false
