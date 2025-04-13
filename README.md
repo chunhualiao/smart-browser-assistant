@@ -103,6 +103,15 @@ Once the extension is published on a browser marketplace like the Chrome Web Sto
 7.  A notification should then appear indicating the result has been **copied to your clipboard**.
 8.  Paste the result wherever you need it (e.g., a reply box, a document).
 
+## Development Note
+
+The majority of the code in this project was generated using AI assistance, specifically:
+*   Microsoft VS Code
+*   Cline Extension
+*   Google Gemini 1.5 Pro
+
+The author provided guidance for feature additions, refinements, and bug fixes throughout the development process.
+
 ## Troubleshooting & Maintenance
 
 *   **Context Menu Not Appearing:** Ensure you are right-clicking *directly on the text you have selected*. Make sure the extension is enabled in `chrome://extensions/`.
