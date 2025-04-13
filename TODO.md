@@ -1,19 +1,19 @@
 ## Feature set v 1.0
 
-persuasive response using best psychological methods
+* persuasive response using best psychological methods
 
-conversational interface
+* conversational interface
 
-multiple right click menu options
+pop up multiple right click menu options
 * translation
 * proofread
-* paraphrase
+* p
 
 copy history of sessions to markdown
 
 monetize it : collect sponsorship?
 
-push to my own git repo: clean up things
+how to add regression tests with github? so commit to only a feature or bug fix branch, automatically test and merge to main only if the tests pass?
 
 ## deploy it
 
