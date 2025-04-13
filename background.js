@@ -91,6 +91,7 @@ async function generateReply(selectedText, tabId) {
   };
 
   // 3. Call OpenRouter API
+  const startTime = performance.now(); // Record start time
   try {
     console.log(`Sending request to OpenRouter (Model: ${settings.selectedModel})...`);
     const response = await fetch(OPENROUTER_API_URL, {
@@ -122,12 +123,16 @@ async function generateReply(selectedText, tabId) {
     if (resultText) {
       console.log("Generated result:", resultText);
 
-      // 4. Log the successful generation
+      const endTime = performance.now(); // Record end time
+      const duration = ((endTime - startTime) / 1000).toFixed(2); // Calculate duration in seconds
+
+      // 4. Log the successful generation (including duration)
       const logEntry = {
         timestamp: new Date().toISOString(),
         model: settings.selectedModel,
         input: selectedText,
-        output: resultText
+        output: resultText,
+        duration: duration // Add duration
       };
       await addLogEntry(logEntry);
 

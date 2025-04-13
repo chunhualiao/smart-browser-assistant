@@ -267,21 +267,20 @@ function displayHistory(history) {
         entryDiv.style.paddingBottom = '10px';
 
         const time = new Date(entry.timestamp).toLocaleString();
-        const model = entry.model || 'N/A'; // Handle potential missing data
+        const model = entry.model || 'N/A';
+        const duration = entry.duration ? `${entry.duration}s` : 'N/A'; // Display duration if available
 
-        // Truncate long input/output for display
-        const maxLen = 150;
-        const inputShort = entry.input.length > maxLen ? entry.input.substring(0, maxLen) + '...' : entry.input;
-        const outputShort = entry.output.length > maxLen ? entry.output.substring(0, maxLen) + '...' : entry.output;
-
+        // Display full text using <pre> for formatting and potential scroll
         entryDiv.innerHTML = `
             <p style="margin: 2px 0;"><small><strong>Time:</strong> ${time}</small></p>
             <p style="margin: 2px 0;"><small><strong>Model:</strong> ${model}</small></p>
-            <p style="margin: 2px 0; white-space: pre-wrap; word-wrap: break-word;"><strong>Input:</strong> ${inputShort}</p>
-            <p style="margin: 2px 0; white-space: pre-wrap; word-wrap: break-word;"><strong>Output:</strong> ${outputShort}</p>
+            <p style="margin: 2px 0;"><small><strong>Duration:</strong> ${duration}</small></p>
+            <p style="margin: 5px 0 2px 0;"><strong>Input:</strong></p>
+            <pre style="margin: 0; padding: 5px; background-color: #f0f0f0; border: 1px solid #ddd; max-height: 100px; overflow-y: auto; white-space: pre-wrap; word-wrap: break-word;">${entry.input}</pre>
+            <p style="margin: 5px 0 2px 0;"><strong>Output:</strong></p>
+            <pre style="margin: 0; padding: 5px; background-color: #f0f0f0; border: 1px solid #ddd; max-height: 150px; overflow-y: auto; white-space: pre-wrap; word-wrap: break-word;">${entry.output}</pre>
         `;
-        // Add full text in a title attribute for hover?
-        entryDiv.title = `Input:\n${entry.input}\n\nOutput:\n${entry.output}`;
+        // No need for title attribute anymore as full text is shown
 
         historyListDiv.appendChild(entryDiv);
     });
