@@ -112,7 +112,10 @@ async function generateReply(selectedText, tabId) {
     }
 
     const data = await response.json();
-    console.log("OpenRouter response data:", data);
+    // --- DEBUGGING: Log the full response data ---
+    console.log("DEBUG: Full API response data:", JSON.stringify(data, null, 2));
+    // --- END DEBUGGING ---
+    console.log("OpenRouter response data:", data); // Keep original brief log too
 
     const resultText = data.choices?.[0]?.message?.content?.trim();
 
