@@ -2,6 +2,21 @@
 
 export const DEFAULT_PROMPTS = [
   {
+    id: "prompt_generate_reply",
+    name: "Generate Reply",
+    text: "Automatically generate a reply for the following text:\n\n\"%TEXT%\""
+  },
+  {
+    id: "prompt_proofread",
+    name: "Proofread Text",
+    text: "Proofread the following text for grammar, spelling, and clarity:\n\n\"%TEXT%\""
+  },
+  {
+    id: "prompt_translate_zh",
+    name: "Translate to Chinese (Simplified)",
+    text: "Translate the following text to Simplified Chinese:\n\n\"%TEXT%\""
+  },
+  {
     id: "prompt_const_amendment",
     name: "Analyze via Specific Amendment",
     text: "Analyze the following text through the lens of the [Specify Amendment, e.g., First Amendment] of the US Constitution. Identify potential conflicts or alignments. Keep it concise (under 280 chars):\n\n\"%TEXT%\""
