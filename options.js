@@ -254,3 +254,15 @@ function showStatus(message, color = 'black') {
 
 document.addEventListener('DOMContentLoaded', restoreOptions);
 saveButton.addEventListener('click', saveOptions);
+
+// Add listener to API key input to refresh models on change
+apiKeyInput.addEventListener('change', (event) => {
+    const newApiKey = event.target.value;
+    console.log("API Key changed, attempting to fetch models...");
+    // Fetch models with the new key, but don't change the saved selection yet
+    fetchModels(newApiKey).then(fetchedModels => {
+        // Get the currently selected model value *before* repopulating
+        const previouslySelectedModel = modelSelect.value;
+        populateModelSelect(fetchedModels, previouslySelectedModel); // Try to keep the selection if the model still exists
+    });
+});
