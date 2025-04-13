@@ -1,4 +1,4 @@
-# X Reply Assistant Chrome Extension (v0.2)
+# Smart Browser Assistant Chrome Extension (v0.2)
 
 This Chrome extension helps generate counter-arguments or critical analyses for **any selected text** on a webpage using the OpenRouter API. It adds a context menu item when you right-click on highlighted text. The generated response is copied to your clipboard. It can be used as an AI assistant to generate responses on social media websites such as x.com . 
 
@@ -9,10 +9,10 @@ This Chrome extension helps generate counter-arguments or critical analyses for 
 
 ## Installation and Setup (Developer Mode)
 
-1.  **Get the Code:** Ensure you have this `x-reply-assistant` folder containing the extension files (`manifest.json`, `background.js`, `options.html`, etc.) on your local machine.
+1.  **Get the Code:** Ensure you have this `smart-browser-assistant` folder containing the extension files (`manifest.json`, `background.js`, `options.html`, etc.) on your local machine.
 
 2.  **Replace Placeholder Icons (Optional but Recommended):**
-    *   Navigate to the `x-reply-assistant/icons/` directory.
+    *   Navigate to the `smart-browser-assistant/icons/` directory.
     *   Replace the placeholder files (`icon16.png`, `icon48.png`, `icon128.png`) with your own actual PNG images of the corresponding sizes (16x16, 48x48, 128x128 pixels).
 
 3.  **Load the Extension in Chrome:**
@@ -20,14 +20,14 @@ This Chrome extension helps generate counter-arguments or critical analyses for 
     *   Navigate to the extensions page by typing `chrome://extensions/` in the address bar and pressing Enter.
     *   Enable "Developer mode". You should see a toggle switch for this, usually in the top-right corner of the page.
     *   Click the "Load unpacked" button (usually appears on the top-left after enabling Developer mode).
-    *   In the file dialog that opens, navigate to and select the **entire `x-reply-assistant` folder** (the one containing `manifest.json`). Click "Select Folder" or "Open".
-    *   The "X Reply Assistant" extension should now appear in your list of installed extensions. If you had a previous version loaded, you might need to click the refresh icon on the extension's card.
+    *   In the file dialog that opens, navigate to and select the **entire `smart-browser-assistant` folder** (the one containing `manifest.json`). Click "Select Folder" or "Open".
+    *   The "Smart Browser Assistant" extension should now appear in your list of installed extensions. If you had a previous version loaded, you might need to click the refresh icon on the extension's card.
 
 4.  **Configure Settings:**
-    *   Find the "X Reply Assistant" extension card on the `chrome://extensions/` page.
+    *   Find the "Smart Browser Assistant" extension card on the `chrome://extensions/` page.
     *   Click the "Details" button.
     *   Scroll down and click "Extension options".
-    *   Alternatively, click the puzzle piece icon in your Chrome toolbar, find "X Reply Assistant", click the three dots next to it, and select "Options".
+    *   Alternatively, click the puzzle piece icon in your Chrome toolbar, find "Smart Browser Assistant", click the three dots next to it, and select "Options".
     *   On the options page:
         *   Enter your **OpenRouter API Key**. The list of AI models will load dynamically once a valid key is entered (you might need to click out of the field).
         *   Select the desired **AI Model** from the dropdown.
@@ -50,7 +50,7 @@ Publishing your extension allows users to install it directly from the browser's
     *   Navigate to `chrome://extensions/`.
     *   Ensure "Developer mode" is enabled.
     *   Click the "Pack extension" button.
-    *   For "Extension root directory", browse and select your `x-reply-assistant` folder.
+    *   For "Extension root directory", browse and select your `smart-browser-assistant` folder.
     *   (Optional) For "Private key file", you can leave this blank for the first packaging. Chrome will generate a `.pem` file. **Save this `.pem` file securely!** You'll need it to update the extension later. If you already have a `.pem` file from a previous packaging, browse and select it here.
     *   Click "Pack extension". This will create a `.crx` file (the packaged extension) and a `.pem` file (the private key, if it was the first time).
 

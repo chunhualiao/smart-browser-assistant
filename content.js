@@ -1,7 +1,7 @@
-// X Reply Assistant - content.js
+// Smart Browser Assistant - content.js
 // v0.2 - Simplified for selection-based context menu
 
-console.log("X Reply Assistant content script loaded (v0.2).");
+console.log("Smart Browser Assistant content script loaded (v0.2).");
 
 // No longer needs to track right-clicked elements or scrape text for this workflow.
 // The background script receives selected text directly via info.selectionText.

@@ -1,4 +1,4 @@
-// X Reply Assistant - background.js
+// Smart Browser Assistant - background.js
 
 const CONTEXT_MENU_ID = "generateReplyX";
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
@@ -53,7 +53,7 @@ chrome.runtime.onInstalled.addListener(() => {
     title: "Generate Counter-Argument", // Updated title
     contexts: ["selection"] // Show only when text is selected
   });
-  console.log("X Reply Assistant context menu created for selection.");
+  console.log("Smart Browser Assistant context menu created for selection.");
 
   // Initialize storage with default prompts if not already set
   chrome.storage.sync.get(['prompts', 'selectedPromptId', 'selectedModel'], (items) => {
@@ -141,7 +141,7 @@ async function generateReply(selectedText, tabId) {
         "Authorization": `Bearer ${settings.apiKey}`,
         // Add "HTTP-Referer": "YOUR_SITE_URL" or "X-Title": "YOUR_APP_NAME" if required by OpenRouter for identification
         // e.g., "HTTP-Referer": chrome.runtime.getURL("options.html"),
-        // e.g., "X-Title": "X Reply Assistant"
+        // e.g., "X-Title": "Smart Browser Assistant"
       },
       body: JSON.stringify(requestBody)
     });
@@ -309,7 +309,7 @@ function notifyUser(tabId, message, type = "info") {
         chrome.scripting.executeScript({
             target: { tabId: tabId },
             func: (msg) => alert(msg),
-            args: [`X Reply Assistant\n${prefix}${message}`]
+            args: [`Smart Browser Assistant\n${prefix}${message}`]
         }).catch(err => console.error("Failed to execute script for notification:", err));
     } else {
         // Fallback if tabId is not available (e.g., called from options page)

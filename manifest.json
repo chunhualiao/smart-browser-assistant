@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "X Reply Assistant",
+  "name": "Smart Browser Assistant",
   "version": "0.1.0",
   "description": "Generates reply suggestions for X posts using OpenRouter.",
   "permissions": [
@@ -37,6 +37,6 @@
         "16": "icons/icon16.jpg",
         "48": "icons/icon48.jpg"
     },
-    "default_title": "X Reply Assistant Settings"
+    "default_title": "Smart Browser Assistant Settings"
   }
 }

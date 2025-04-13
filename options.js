@@ -1,4 +1,4 @@
-// X Reply Assistant - options.js (v0.2)
+// Smart Browser Assistant - options.js (v0.2)
 
 // --- DOM Elements ---
 const apiKeyInput = document.getElementById('apiKey');
@@ -91,7 +91,7 @@ async function fetchModels(apiKey) {
         "Authorization": `Bearer ${apiKey}`,
         // OpenRouter might require Referer or X-Title for identification even for GET /models
         // "HTTP-Referer": chrome.runtime.getURL("options.html"),
-        // "X-Title": "X Reply Assistant"
+        // "X-Title": "Smart Browser Assistant"
       },
     });
 
