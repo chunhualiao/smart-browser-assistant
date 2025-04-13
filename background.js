@@ -150,8 +150,10 @@ async function generateReply(selectedText, tabId) {
 
 // Add entry to the log history in local storage
 async function addLogEntry(entry) {
+  console.log("DEBUG: Attempting to add log entry:", JSON.stringify(entry)); // Log the entry being added
   try {
     const result = await chrome.storage.local.get({ history: [] }); // Default to empty array
+    console.log("DEBUG: Current history length before add:", result.history.length); // Log current length
     let history = result.history;
 
     // Add new entry to the beginning
@@ -163,10 +165,11 @@ async function addLogEntry(entry) {
       history = history.slice(0, MAX_HISTORY_SIZE);
     }
 
+    console.log("DEBUG: History length after add/slice:", history.length); // Log length after modification
     await chrome.storage.local.set({ history: history });
-    console.log("Log entry added. History size:", history.length);
+    console.log("Log entry added. History size:", history.length); // Keep original success log
   } catch (error) {
-    console.error("Error saving log entry:", error);
+    console.error("Error saving log entry:", error); // Keep error log
   }
 }
 
