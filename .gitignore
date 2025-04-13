@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json # Optional: Some prefer to commit this, others don't. Let's ignore for now unless specified.
+
+# Chrome Extension Packaging
+*.crx
+*.pem
+
+# Environment Variables
+.env*
+
+# IDE/Editor specific
+.vscode/
