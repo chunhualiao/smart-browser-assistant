@@ -96,11 +96,13 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   }
 });
 
-// Listen for storage changes to update the context menu dynamically
+// Listen for storage changes (e.g., for debugging or future use, but don't update menu here)
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName === 'sync' && changes.prompts) {
-    console.log("Prompts changed in storage, updating context menu...");
-    updateContextMenu(changes.prompts.newValue);
+    // The menu doesn't need to be rebuilt here.
+    // The onClicked listener fetches the current prompt details dynamically.
+    console.log("Prompts changed in storage. Context menu will use updated prompts on next click.");
+    // updateContextMenu(changes.prompts.newValue); // REMOVED: This was likely causing duplicate errors
   }
 });
 
