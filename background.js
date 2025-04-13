@@ -114,10 +114,9 @@ async function generateReply(selectedText, tabId) {
     }
 
     const data = await response.json();
-    // --- DEBUGGING: Log the full response data ---
-    console.log("DEBUG: Full API response data:", JSON.stringify(data, null, 2));
-    // --- END DEBUGGING ---
-    console.log("OpenRouter response data:", data); // Keep original brief log too
+    // Log the full response data for potential future debugging
+    console.log("Full API response data:", JSON.stringify(data, null, 2));
+    // console.log("OpenRouter response data:", data); // Can likely remove the less detailed log now
 
     const resultText = data.choices?.[0]?.message?.content?.trim();
 
@@ -156,10 +155,10 @@ async function generateReply(selectedText, tabId) {
 
 // Add entry to the log history in local storage
 async function addLogEntry(entry) {
-  console.log("DEBUG: Attempting to add log entry:", JSON.stringify(entry)); // Log the entry being added
+  // console.log("DEBUG: Attempting to add log entry:", JSON.stringify(entry)); // Remove debug log
   try {
     const result = await chrome.storage.local.get({ history: [] }); // Default to empty array
-    console.log("DEBUG: Current history length before add:", result.history.length); // Log current length
+    // console.log("DEBUG: Current history length before add:", result.history.length); // Remove debug log
     let history = result.history;
 
     // Add new entry to the beginning
@@ -171,7 +170,7 @@ async function addLogEntry(entry) {
       history = history.slice(0, MAX_HISTORY_SIZE);
     }
 
-    console.log("DEBUG: History length after add/slice:", history.length); // Log length after modification
+    // console.log("DEBUG: History length after add/slice:", history.length); // Remove debug log
     await chrome.storage.local.set({ history: history });
     console.log("Log entry added. History size:", history.length); // Keep original success log
   } catch (error) {
