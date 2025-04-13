@@ -7,12 +7,12 @@ const promptListDiv = document.getElementById('promptList');
 const promptPreviewDiv = document.getElementById('promptPreview');
 const saveButton = document.getElementById('save');
 const statusDiv = document.getElementById('status');
+const OPENROUTER_MODELS_URL = "https://openrouter.ai/api/v1/models"; // API endpoint for models
 
 // --- Default/Predefined Data ---
 
-// Example list of common OpenRouter models.
-// Fetching dynamically would require an API call here.
-const PREDEFINED_MODELS = [
+// Example list of common OpenRouter models. - REMOVED, will fetch dynamically
+/* const PREDEFINED_MODELS = [
   "openai/gpt-4o",
   "openai/gpt-4-turbo",
   "openai/gpt-3.5-turbo",
@@ -24,7 +24,7 @@ const PREDEFINED_MODELS = [
   "mistralai/mistral-7b-instruct",
   "meta-llama/llama-3-8b-instruct",
   "meta-llama/llama-3-70b-instruct",
-];
+]; */
 
 // Default prompts (should match background.js)
 const DEFAULT_PROMPTS = [
@@ -37,9 +37,70 @@ let currentPrompts = []; // To hold loaded prompts
 
 // --- Functions ---
 
+// Fetch models from OpenRouter API
+async function fetchModels(apiKey) {
+  if (!apiKey) {
+    console.warn("No API key found, cannot fetch models.");
+    // Keep the "Loading..." or show an error message in the dropdown
+    modelSelect.innerHTML = '<option value="">Enter API Key to load models</option>';
+    return []; // Return empty array
+  }
+
+  console.log("Fetching models from OpenRouter...");
+  try {
+    const response = await fetch(OPENROUTER_MODELS_URL, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        // OpenRouter might require Referer or X-Title for identification even for GET /models
+        // "HTTP-Referer": chrome.runtime.getURL("options.html"),
+        // "X-Title": "X Reply Assistant"
+      },
+    });
+
+    if (!response.ok) {
+      // Handle specific errors like 401 Unauthorized
+      if (response.status === 401) {
+         console.error("Failed to fetch models: Invalid API Key (401).");
+         modelSelect.innerHTML = '<option value="">Invalid API Key</option>';
+      } else {
+        console.error(`Failed to fetch models: ${response.status} ${response.statusText}`);
+        modelSelect.innerHTML = `<option value="">API Error ${response.status}</option>`;
+      }
+      const errorData = await response.json().catch(() => null);
+      console.error("API Error details:", errorData);
+      return []; // Return empty on error
+    }
+
+    const data = await response.json();
+    // Assuming the response structure is { data: [ { id: "model/name", ... }, ... ] }
+    if (data && Array.isArray(data.data)) {
+        const modelIds = data.data.map(model => model.id).sort(); // Extract IDs and sort
+        console.log("Fetched models:", modelIds.length);
+        return modelIds;
+    } else {
+        console.error("Unexpected API response structure:", data);
+        modelSelect.innerHTML = '<option value="">Invalid API Response</option>';
+        return [];
+    }
+  } catch (error) {
+    console.error("Network error fetching models:", error);
+    modelSelect.innerHTML = '<option value="">Network Error</option>';
+    return []; // Return empty on network error
+  }
+}
+
+
 // Populate Model Select Dropdown
 function populateModelSelect(models, selectedModelId) {
   modelSelect.innerHTML = ''; // Clear loading/existing options
+  if (!models || models.length === 0) {
+      // If fetch failed or returned empty, show appropriate message based on prior state
+      if (modelSelect.innerHTML === '') { // Avoid overwriting specific error messages from fetchModels
+          modelSelect.innerHTML = '<option value="">No models loaded</option>';
+      }
+      return;
+  }
   models.forEach(modelId => {
     const option = document.createElement('option');
     option.value = modelId;
@@ -156,20 +217,24 @@ function restoreOptions() {
        if (chrome.runtime.lastError) {
          console.error("Error restoring settings:", chrome.runtime.lastError);
          showStatus('Error loading saved settings.', 'red');
-         // Populate with defaults even on error?
+         // Attempt to populate prompts even on error, but models will likely fail
          currentPrompts = DEFAULT_PROMPTS;
-         populateModelSelect(PREDEFINED_MODELS, "openai/gpt-3.5-turbo");
          populatePromptList(currentPrompts, DEFAULT_PROMPTS[0]?.id);
+         // Clear model list or show error
+         modelSelect.innerHTML = '<option value="">Error loading settings</option>';
 
        } else {
          apiKeyInput.value = items.openRouterApiKey;
          currentPrompts = items.prompts; // Use saved or default prompts
 
-         // Populate UI elements
-         populateModelSelect(PREDEFINED_MODELS, items.selectedModel);
-         populatePromptList(currentPrompts, items.selectedPromptId);
+         // Fetch models dynamically using the restored API key
+         fetchModels(items.openRouterApiKey).then(fetchedModels => {
+             // Populate UI elements
+             populateModelSelect(fetchedModels, items.selectedModel); // Use fetched models
+             populatePromptList(currentPrompts, items.selectedPromptId);
+             console.log("Settings restored, models fetched (if API key valid).");
+         }); // No catch here, fetchModels handles its own errors internally by updating dropdown
 
-         console.log("Settings restored.");
        }
     }
   );
