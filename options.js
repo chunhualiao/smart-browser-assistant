@@ -7,6 +7,7 @@ const promptListDiv = document.getElementById('promptList');
 const promptPreviewDiv = document.getElementById('promptPreview');
 const temperatureInput = document.getElementById('temperature'); // Temperature input
 const timeoutInput = document.getElementById('timeout'); // Timeout input
+const verboseLoggingCheckbox = document.getElementById('verboseLogging'); // Verbose logging checkbox
 const saveButton = document.getElementById('save');
 const statusDiv = document.getElementById('status');
 const historyListDiv = document.getElementById('historyList'); // History display area
@@ -202,6 +203,7 @@ function saveOptions() {
   const editedPromptText = promptPreviewDiv.value; // Get text from textarea
   const temperature = parseFloat(temperatureInput.value); // Get temperature value
   const timeout = parseInt(timeoutInput.value, 10); // Get timeout value
+  const verboseLoggingEnabled = verboseLoggingCheckbox.checked; // Get verbose logging state
   const MIN_TIMEOUT = 5; // Minimum allowed timeout in seconds
 
   if (isNaN(temperature) || temperature < 0 || temperature > 2) {
@@ -240,6 +242,7 @@ function saveOptions() {
       selectedPromptId: selectedPromptId,
       temperature: temperature, // Save temperature
       timeout: timeout, // Save timeout
+      verboseLoggingEnabled: verboseLoggingEnabled, // Save verbose logging setting
       prompts: currentPrompts // Save the potentially modified prompts array
     },
     () => {
@@ -263,6 +266,7 @@ function restoreOptions() {
       selectedPromptId: DEFAULT_PROMPTS[0]?.id || null, // Default to first prompt ID
       temperature: 0.9, // Default temperature
       timeout: 30, // Default timeout in seconds
+      verboseLoggingEnabled: false, // Default verbose logging to off
       prompts: DEFAULT_PROMPTS // Load saved prompts or use default
     },
     (items) => {
@@ -279,6 +283,7 @@ function restoreOptions() {
          apiKeyInput.value = items.openRouterApiKey;
          temperatureInput.value = items.temperature; // Restore temperature
          timeoutInput.value = items.timeout; // Restore timeout
+         verboseLoggingCheckbox.checked = items.verboseLoggingEnabled; // Restore verbose logging state
          currentPrompts = items.prompts; // Use saved or default prompts
 
          // Fetch models dynamically using the restored API key

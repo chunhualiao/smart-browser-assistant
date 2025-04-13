@@ -155,9 +155,12 @@ async function generateReply(selectedText, tabId) {
     }
 
     const data = await response.json();
-    // Avoid logging full response data for security/privacy. Log only confirmation or specific fields if needed.
+    // Log confirmation
     console.log("Received successful response from OpenRouter."); 
-    // console.log("OpenRouter response data:", data); // Example of logging specific field if needed: console.log("Response ID:", data.id);
+    // Conditionally log full response if verbose logging is enabled
+    if (settings.verboseLoggingEnabled) {
+        console.log("Full API response data (Verbose Logging Enabled):", JSON.stringify(data, null, 2));
+    }
 
     const resultText = data.choices?.[0]?.message?.content?.trim();
 
@@ -232,12 +235,12 @@ async function getSettings() {
   const DEFAULT_TIMEOUT = 30; // Default timeout
 
   return new Promise((resolve) => {
-    // Include 'temperature' and 'timeout' in the keys to retrieve
-    chrome.storage.sync.get(['openRouterApiKey', 'selectedModel', 'selectedPromptId', 'prompts', 'temperature', 'timeout'], (items) => {
+    // Include 'verboseLoggingEnabled' along with other keys
+    chrome.storage.sync.get(['openRouterApiKey', 'selectedModel', 'selectedPromptId', 'prompts', 'temperature', 'timeout', 'verboseLoggingEnabled'], (items) => {
       if (chrome.runtime.lastError) {
         console.error("Error getting settings from storage:", chrome.runtime.lastError);
         // Ensure all expected fields are returned, even on error (as null/default)
-        resolve({ apiKey: null, selectedModel: null, selectedPrompt: null, temperature: 0.9, timeout: DEFAULT_TIMEOUT }); // Default temp/timeout on error
+        resolve({ apiKey: null, selectedModel: null, selectedPrompt: null, temperature: 0.9, timeout: DEFAULT_TIMEOUT, verboseLoggingEnabled: false }); // Default settings on error
       } else {
         const prompts = items.prompts || DEFAULT_PROMPTS;
         const selectedPrompt = prompts.find(p => p.id === items.selectedPromptId) || prompts[0]; // Fallback
@@ -257,7 +260,8 @@ async function getSettings() {
           selectedModel: items.selectedModel || "openai/gpt-3.5-turbo", // Fallback model
           selectedPrompt: selectedPrompt,
           temperature: temperature, // Use validated or default temperature
-          timeout: timeout // Use validated or default timeout
+          timeout: timeout, // Use validated or default timeout
+          verboseLoggingEnabled: items.verboseLoggingEnabled || false // Default to false if not set
         });
       }
     });
