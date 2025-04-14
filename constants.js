@@ -4,7 +4,7 @@ export const DEFAULT_PROMPTS = [
   {
     id: "1", // Changed from "prompt_generate_reply"
     name: "Generate Reply",
-    text: "Automatically generate a reply for the following text:\n\n\"%TEXT%\""
+    text: "Automatically generate a reply following the text below. Be insightful and suitable for social media like x.com . Limit to 1000 characters. Do not use markdown, use pure text:\n\n\"%TEXT%\""
   },
   {
     id: "2", // Changed from "prompt_proofread"
