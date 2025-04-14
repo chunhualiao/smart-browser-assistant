@@ -28,8 +28,27 @@
      }
     button:hover { background-color: #0056b3; }
     #status { margin-top: 15px; font-weight: bold; min-height: 1.2em; }
-    .prompt-selection { margin-bottom: 10px; }
-    .prompt-selection label { font-weight: normal; display: inline-block; margin-left: 5px; }
+    .prompt-selection {
+        margin-bottom: 10px;
+        display: flex; /* Use flexbox for alignment */
+        align-items: center; /* Vertically align items */
+    }
+    .prompt-selection input[type="radio"] { /* Style radio button */
+        margin-right: 5px; /* Space between radio and name input */
+    }
+    .prompt-selection label { /* Label is now visually hidden but used for accessibility */
+       /* font-weight: normal; display: inline-block; margin-left: 5px; */ /* No longer needed */
+       position: absolute; /* Take out of layout flow */
+       width: 1px; height: 1px; /* Make tiny */
+       overflow: hidden; /* Hide overflow */
+       clip: rect(0,0,0,0); /* Hide visually */
+    }
+    /* Style for the name input field added by JS */
+    .prompt-selection input[type="text"] {
+        flex-grow: 1; /* Allow input to take available space */
+        margin-left: 5px; /* Space from radio button */
+        /* JS already adds padding, border, etc. */
+    }
     .prompt-details {
         margin-top: 10px;
         padding: 10px;

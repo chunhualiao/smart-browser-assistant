@@ -129,10 +129,22 @@ function populatePromptList(prompts, selectedPromptId) {
 
     const label = document.createElement('label');
     label.htmlFor = prompt.id;
-    label.textContent = prompt.name;
+    // label.textContent = prompt.name; // Label text is now just for the radio button itself
+
+    // Create an input field for the name
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.id = `name-input-${prompt.id}`; // Unique ID for the name input
+    nameInput.value = prompt.name;
+    nameInput.style.marginLeft = '10px'; // Add some spacing
+    nameInput.style.padding = '4px';
+    nameInput.style.border = '1px solid #ccc';
+    nameInput.style.borderRadius = '3px';
+    // nameInput.placeholder = "Prompt Name"; // Optional placeholder
 
     div.appendChild(radio);
-    div.appendChild(label);
+    div.appendChild(label); // Keep the label associated with the radio
+    div.appendChild(nameInput); // Add the name input field
     promptListDiv.appendChild(div);
 
     // Add listener to update preview when this prompt is selected
@@ -197,7 +209,19 @@ function saveOptions() {
       return; // Don't save if we couldn't find the prompt
   }
 
-  // Save the updated prompts array along with other settings
+  // Before saving, update prompt names from the input fields
+  currentPrompts.forEach(prompt => {
+      const nameInput = document.getElementById(`name-input-${prompt.id}`);
+      if (nameInput && nameInput.value.trim()) { // Ensure input exists and has a non-empty value
+          prompt.name = nameInput.value.trim();
+      } else if (nameInput) {
+          console.warn(`Prompt name for ID ${prompt.id} was empty. Keeping original name: ${prompt.name}`);
+          // Optionally show a status warning or prevent saving empty names
+          // For now, we just keep the old name if the input is empty
+      }
+  });
+
+  // Save the updated prompts array (with potentially modified names) along with other settings
   chrome.storage.sync.set(
     {
       openRouterApiKey: apiKey,
