@@ -5,6 +5,7 @@ This Chrome extension acts as an AI assistant for **any selected text** on a web
 ## Prerequisites
 
 *   Google Chrome browser installed.
+*   https://chromewebstore.google.com/detail/ljnkjogcdagiakilefpifeonipbmcdgf?utm_source=item-share-cb Public release version of this extension
 *   An API key from [OpenRouter.ai](https://openrouter.ai/).
 
 ## Installation and Setup (Developer Mode)
@@ -75,10 +76,10 @@ Publishing your extension allows users to install it directly from the browser's
 
 Once the extension is published on a browser marketplace like the Chrome Web Store:
 
-1.  **Visit the Store Listing:** Navigate to the extension's page on the Chrome Web Store (or the relevant marketplace for other browsers). You'll typically get a direct link after publishing.
-2.  **Add to Browser:** Click the "Add to Chrome" (or similar) button.
-3.  **Confirm Permissions:** A dialog will appear asking for necessary permissions. Review them and click "Add extension" to confirm.
-4.  **Configuration:** After installation, follow the steps in the "Configure Settings" section above (accessing options via the Extensions menu) to add your API key and select your preferred model/prompt.
+1.  **Visit the Store Listing:** Navigate to the extension's page on the Chrome Web Store (or the relevant marketplace for other browsers). [Link](https://chromewebstore.google.com/detail/ljnkjogcdagiakilefpifeonipbmcdgf?utm_source=item-share-cb) 
+3.  **Add to Browser:** Click the "Add to Chrome" (or similar) button.
+4.  **Confirm Permissions:** A dialog will appear asking for necessary permissions. Review them and click "Add extension" to confirm.
+5.  **Configuration:** After installation, follow the steps in the "Configure Settings" section above (accessing options via the Extensions menu) to add your API key and select your preferred model/prompt.
 
 ## Features
 
