@@ -79,9 +79,10 @@ Once the extension is published on a browser marketplace like the Chrome Web Sto
 1.  **Visit the Store Listing:** Navigate to the extension's page on the Chrome Web Store (or the relevant marketplace for other browsers). [Link](https://chromewebstore.google.com/detail/ljnkjogcdagiakilefpifeonipbmcdgf?utm_source=item-share-cb) 
 3.  **Add to Browser:** Click the "Add to Chrome" (or similar) button.
 4.  **Confirm Permissions:** A dialog will appear asking for necessary permissions. Review them and click "Add extension" to confirm.
-5.  **Configuration:** After installation, follow the steps in the "Configure Settings" section above (accessing options via the Extensions menu) to add your API key and select your preferred model/prompt. Some models available through OpenRouter, such as `openai/gpt-4o-mini-search-preview`, support web search by default, which can be especially useful for tasks like fact-checking.
+5.  **Configuration:** After installation, follow the steps in the "Configure Settings" section above (accessing options via the Extensions menu) to add your API key and select your preferred model/prompt. Some models available through OpenRouter, such as `openai/gpt-4o-mini-search-preview`, support web search by default, which can be especially useful for tasks like fact-checking posts on X.
 
 ## Features
+See `doc/developer_deployment.md` for information on deploying this extension to various marketplaces.
 
 *   Adds a **two-level context menu** when right-clicking selected text:
     *   Top Level: "Smart Browser Assistant"
