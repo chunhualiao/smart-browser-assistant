@@ -31,7 +31,7 @@ This Chrome extension acts as an AI assistant for **any selected text** on a web
     *   Alternatively, click the puzzle piece icon in your Chrome toolbar, find "Smart Browser Assistant", click the three dots next to it, and select "Options".
     *   On the options page:
         *   Enter your **OpenRouter API Key**. The list of AI models will load dynamically once a valid key is entered (you might need to click out of the field).
-        *   Select the desired **AI Model** from the dropdown.
+        *   Select the desired **AI Model** from the dropdown. Please note that some thinking or reasoning models may take up to 20 seconds to respond due to their complexity. We ask for your patience when using such models. An example of this is the Gemini Pro 2.5 experimental model.
         *   Adjust the **Temperature (Creativity)** setting (0=focused, 1+=creative).
         *   Set the **API Timeout** in seconds (default 30, min 5). This is the maximum time the extension will wait for a response from the API before showing an error.
         *   Choose the **Active Prompt** you want the context menu to use.
