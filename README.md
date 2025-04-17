@@ -1,6 +1,6 @@
 # Smart Browser Assistant Chrome Extension (v0.2)
 
-This Chrome extension acts as an AI assistant for **any selected text** on a webpage using the OpenRouter API. It adds a context menu item when you right-click on highlighted text, allowing you to perform various actions like generating replies, proofreading, translating, or performing critical analysis. The generated response is copied to your clipboard. It's useful for tasks like drafting social media responses, improving writing, or understanding text from different perspectives.
+This Chrome extension acts as an AI assistant for **any selected text** on a webpage using the OpenRouter API. Some models available through OpenRouter, such as `openai/gpt-4o-mini`, support web search by default, which can be especially useful for tasks like fact-checking posts on X. It adds a context menu item when you right-click on highlighted text, allowing you to perform various actions like generating replies, proofreading, translating, or performing critical analysis. The generated response is copied to your clipboard. It's useful for tasks like drafting social media responses, improving writing, or understanding text from different perspectives.
 
 ## Prerequisites
 
@@ -52,7 +52,7 @@ Publishing your extension allows users to install it directly from the browser's
     *   Ensure "Developer mode" is enabled.
     *   Click the "Pack extension" button.
     *   For "Extension root directory", browse and select your `smart-browser-assistant` folder.
-    *   (Optional) For "Private key file", you can leave this blank for the first packaging. Chrome will generate a `.pem` file. **Save this `.pem` file securely!** You'll need it to update the extension later. If you already have a `.pem` file from a previous packaging, browse and select it here.
+    *   (Optional) For "Private key file", you can leave this blank for the first packaging. **Save this `.pem` file securely!** You'll need it to update the extension later. If you already have a `.pem` file from a previous packaging, browse and select it here.
     *   Click "Pack extension". This will create a `.crx` file (the packaged extension) and a `.pem` file (the private key, if it was the first time).
 
 3.  **Create a Developer Account:**
@@ -79,7 +79,7 @@ Once the extension is published on a browser marketplace like the Chrome Web Sto
 1.  **Visit the Store Listing:** Navigate to the extension's page on the Chrome Web Store (or the relevant marketplace for other browsers). [Link](https://chromewebstore.google.com/detail/ljnkjogcdagiakilefpifeonipbmcdgf?utm_source=item-share-cb) 
 3.  **Add to Browser:** Click the "Add to Chrome" (or similar) button.
 4.  **Confirm Permissions:** A dialog will appear asking for necessary permissions. Review them and click "Add extension" to confirm.
-5.  **Configuration:** After installation, follow the steps in the "Configure Settings" section above (accessing options via the Extensions menu) to add your API key and select your preferred model/prompt.
+5.  **Configuration:** After installation, follow the steps in the "Configure Settings" section above (accessing options via the Extensions menu) to add your API key and select your preferred model/prompt. Some models available through OpenRouter, such as `openai/gpt-4o-mini-search-preview`, support web search by default, which can be especially useful for tasks like fact-checking.
 
 ## Features
 
@@ -99,6 +99,7 @@ Once the extension is published on a browser marketplace like the Chrome Web Sto
 *   Dynamically loads available models from OpenRouter (requires valid API key).
 *   Logs generation history (timestamp, model, duration, input, output) locally.
 *   Provides an option to view and clear the generation history.
+*   **Model Performance Testing:** Allows testing the response time of randomly sampled models directly from the options page. 
 
 ## How to Use
 

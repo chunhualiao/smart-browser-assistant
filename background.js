@@ -110,9 +110,77 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
 // Listen for messages (e.g., from options page)
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log("Received message:", message);
-  // Example: Handle potential messages if needed
-  // if (message.action === "someAction") { ... }
-  return true; // Indicates asynchronous response possible
+
+  if (message.action === "testModelPerformance") {
+    const { modelId, apiKey } = message;
+    if (!modelId || !apiKey) {
+      console.error("Missing modelId or apiKey for testModelPerformance");
+      sendResponse({ success: false, error: "Missing modelId or apiKey" });
+      return false; // No async response needed
+    }
+
+    console.log(`Background: Testing model ${modelId}...`);
+    const testPrompt = "What model are you?";
+    const testTimeoutSeconds = 20; // Use a fixed timeout for the test
+
+    const requestBody = {
+      model: modelId,
+      messages: [{ role: "user", content: testPrompt }],
+      temperature: 0.1, // Low temperature for consistent test
+      max_tokens: 50 // Limit response size for test
+    };
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+        console.log(`Test request for ${modelId} timed out after ${testTimeoutSeconds} seconds.`);
+        controller.abort();
+    }, testTimeoutSeconds * 1000);
+
+    fetch(OPENROUTER_API_URL, {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+        // Add Referer/Title if needed
+        // "HTTP-Referer": chrome.runtime.getURL("options.html"),
+        // "X-Title": "Smart Browser Assistant"
+      },
+      body: JSON.stringify(requestBody)
+    })
+    .then(async (response) => {
+      clearTimeout(timeoutId);
+      console.log(`Test response status for ${modelId}: ${response.status}`);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: response.statusText }));
+        throw new Error(`API Error ${response.status}: ${errorData.error?.message || response.statusText}`);
+      }
+      const data = await response.json();
+      // Basic check if response seems valid (contains choices)
+      if (data.choices && data.choices.length > 0 && data.choices[0].message?.content) {
+        console.log(`Test success for ${modelId}.`);
+        sendResponse({ success: true });
+      } else {
+        console.error(`Test failed for ${modelId}: Invalid response structure.`);
+        sendResponse({ success: false, error: "Invalid response structure" });
+      }
+    })
+    .catch(error => {
+      clearTimeout(timeoutId);
+      let errorMessage = error.message;
+      if (error.name === 'AbortError') {
+          errorMessage = `Timeout after ${testTimeoutSeconds}s`;
+      }
+      console.error(`Test failed for ${modelId}: ${errorMessage}`);
+      sendResponse({ success: false, error: errorMessage });
+    });
+
+    return true; // Indicates asynchronous response
+  }
+
+  // Handle other potential messages here if needed
+
+  return true; // Keep true for other potential async messages
 });
 
 

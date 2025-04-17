@@ -14,6 +14,8 @@ const saveButton = document.getElementById('save');
 const statusDiv = document.getElementById('status');
 const historyListDiv = document.getElementById('historyList'); // History display area
 const clearHistoryButton = document.getElementById('clearHistory'); // Clear history button
+const testModelsButton = document.getElementById('testModels'); // Model test button
+const testResultsDiv = document.getElementById('testResults'); // Model test results area
 const OPENROUTER_MODELS_URL = "https://openrouter.ai/api/v1/models"; // API endpoint for models
 
 // --- Default/Predefined Data ---
@@ -346,6 +348,114 @@ async function clearHistory() {
     }
 }
 
+// --- Model Performance Test ---
+
+// Fisher-Yates (Knuth) Shuffle algorithm
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+    }
+    return array;
+}
+
+async function testModelPerformance() {
+    console.log("Starting model performance test...");
+    testResultsDiv.innerHTML = 'Starting test...'; // Initial status
+
+    const apiKey = apiKeyInput.value;
+    if (!apiKey) {
+        testResultsDiv.innerHTML = '<p style="color: red;">Error: API Key is required to test models.</p>';
+        return;
+    }
+
+    // Get models from the dropdown
+    const availableModels = Array.from(modelSelect.options)
+                                .map(option => option.value)
+                                .filter(value => value); // Filter out empty values (like "Loading...")
+
+    if (availableModels.length === 0) {
+        testResultsDiv.innerHTML = '<p style="color: red;">Error: No models loaded in the dropdown. Check API Key.</p>';
+        return;
+    }
+
+    const modelsToTestCount = Math.min(10, availableModels.length); // Test up to 10 or fewer if not enough
+    const selectedModels = shuffleArray([...availableModels]).slice(0, modelsToTestCount);
+
+    console.log(`Testing ${modelsToTestCount} models:`, selectedModels);
+    testResultsDiv.innerHTML = `<p>Testing ${modelsToTestCount} models (using prompt: "What model are you?")...</p><hr>`;
+
+    const results = [];
+    let successfulTests = 0;
+    let totalTime = 0;
+
+    // Disable button during test
+    testModelsButton.disabled = true;
+    testModelsButton.textContent = 'Testing...';
+
+    for (const modelId of selectedModels) {
+        testResultsDiv.innerHTML += `<p>Testing ${modelId}... `;
+        const startTime = performance.now();
+        try {
+            const response = await chrome.runtime.sendMessage({
+                action: "testModelPerformance",
+                modelId: modelId,
+                apiKey: apiKey // Send API key for this specific test
+                // Note: We send the key here because background might not have the latest one if user just changed it
+            });
+
+            const endTime = performance.now();
+            const duration = ((endTime - startTime) / 1000).toFixed(2); // Duration in seconds
+
+            if (response.success) {
+                results.push({ model: modelId, time: parseFloat(duration), success: true });
+                successfulTests++;
+                totalTime += parseFloat(duration);
+                testResultsDiv.innerHTML += `<span style="color: green;">Success (${duration}s)</span></p>`;
+                console.log(`Test success for ${modelId}: ${duration}s`);
+            } else {
+                // Handle errors reported by background script (e.g., API errors, timeouts)
+                results.push({ model: modelId, error: response.error || 'Unknown error', success: false });
+                testResultsDiv.innerHTML += `<span style="color: red;">Failed (${response.error || 'Unknown error'})</span></p>`;
+                console.error(`Test failed for ${modelId}:`, response.error);
+            }
+        } catch (error) {
+            // Handle errors in sending message or if background script is unavailable
+            const endTime = performance.now();
+            const duration = ((endTime - startTime) / 1000).toFixed(2);
+            results.push({ model: modelId, error: `Communication error: ${error.message}`, success: false });
+            testResultsDiv.innerHTML += `<span style="color: red;">Failed (Communication error)</span></p>`;
+            console.error(`Error testing model ${modelId}:`, error);
+        }
+    }
+
+    // Re-enable button
+    testModelsButton.disabled = false;
+    testModelsButton.textContent = 'Test Random 10 Models';
+
+    // Display summary
+    testResultsDiv.innerHTML += '<hr><p><strong>Test Complete</strong></p>';
+    if (successfulTests > 0) {
+        const averageTime = (totalTime / successfulTests).toFixed(2);
+        testResultsDiv.innerHTML += `<p>Average response time for ${successfulTests} successful tests: <strong>${averageTime} seconds</strong></p>`;
+        console.log(`Average response time: ${averageTime}s`);
+    } else {
+        testResultsDiv.innerHTML += `<p>No models completed the test successfully.</p>`;
+        console.log("No successful tests.");
+    }
+
+    // Optionally display detailed results table
+    testResultsDiv.innerHTML += '<h3>Detailed Results:</h3><ul>';
+    results.forEach(res => {
+        if (res.success) {
+            testResultsDiv.innerHTML += `<li>${res.model}: ${res.time}s</li>`;
+        } else {
+            testResultsDiv.innerHTML += `<li>${res.model}: <span style="color: red;">Failed (${res.error})</span></li>`;
+        }
+    });
+    testResultsDiv.innerHTML += '</ul>';
+}
+
 
 // --- Event Listeners ---
 
@@ -363,6 +473,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 saveButton.addEventListener('click', saveOptions);
 clearHistoryButton.addEventListener('click', clearHistory); // Add listener for clear button
+testModelsButton.addEventListener('click', testModelPerformance); // Add listener for model test button
 
 // Add listener to API key input to refresh models on change
 apiKeyInput.addEventListener('change', (event) => {
