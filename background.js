@@ -1,6 +1,6 @@
 // Smart Browser Assistant - background.js
 
-import { DEFAULT_PROMPTS } from './constants.js';
+import { DEFAULT_PROMPTS, DEFAULT_MODEL } from './constants.js'; // Import DEFAULT_MODEL
 
 const PARENT_MENU_ID = "smartAssistantParent";
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
@@ -56,7 +56,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     storageUpdates.selectedPromptId = DEFAULT_PROMPTS[0]?.id || null; // Default to first prompt ID
   }
   if (!items.selectedModel) {
-    storageUpdates.selectedModel = "openai/gpt-3.5-turbo"; // Default model
+    storageUpdates.selectedModel = DEFAULT_MODEL; // Use constant for default model
   }
   // Also ensure temperature and timeout have defaults if not set
   if (items.temperature === undefined) storageUpdates.temperature = 0.9;
@@ -345,7 +345,7 @@ async function getSettings() {
         // Provide defaults on error
         resolve({
             apiKey: null,
-            selectedModel: "openai/gpt-3.5-turbo", // Default model
+            selectedModel: DEFAULT_MODEL, // Use constant for default model
             selectedPromptId: null, // No specific prompt selected in this context
             prompts: DEFAULT_PROMPTS, // Default prompts list
             temperature: 0.9,
@@ -365,7 +365,7 @@ async function getSettings() {
 
         resolve({
           apiKey: items.openRouterApiKey || null,
-          selectedModel: items.selectedModel || "openai/gpt-3.5-turbo", // Fallback model
+          selectedModel: items.selectedModel || DEFAULT_MODEL, // Use constant for fallback model
           selectedPromptId: items.selectedPromptId || DEFAULT_PROMPTS[0]?.id || null, // For options page
           prompts: items.prompts || DEFAULT_PROMPTS, // For options page
           temperature: temperature,

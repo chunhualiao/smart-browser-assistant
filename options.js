@@ -1,6 +1,6 @@
 // Smart Browser Assistant - options.js (v0.2)
 
-import { DEFAULT_PROMPTS } from './constants.js';
+import { DEFAULT_PROMPTS, DEFAULT_MODEL } from './constants.js'; // Import DEFAULT_MODEL
 
 // --- DOM Elements ---
 const apiKeyInput = document.getElementById('apiKey');
@@ -41,35 +41,25 @@ let currentPrompts = []; // To hold loaded prompts
 // --- Functions ---
 
 // Fetch models from OpenRouter API
-async function fetchModels(apiKey) {
-  if (!apiKey) {
-    console.warn("No API key found, cannot fetch models.");
-    // Keep the "Loading..." or show an error message in the dropdown
-    modelSelect.innerHTML = '<option value="">Enter API Key to load models</option>';
-    return []; // Return empty array
-  }
+async function fetchModels() { // Removed apiKey parameter
+  // Removed API key check
 
   console.log("Fetching models from OpenRouter...");
   try {
     const response = await fetch(OPENROUTER_MODELS_URL, {
       method: "GET",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
+      // Removed Authorization header
+      // headers: {
         // OpenRouter might require Referer or X-Title for identification even for GET /models
         // "HTTP-Referer": chrome.runtime.getURL("options.html"),
         // "X-Title": "Smart Browser Assistant"
-      },
+      // },
     });
 
     if (!response.ok) {
-      // Handle specific errors like 401 Unauthorized
-      if (response.status === 401) {
-         console.error("Failed to fetch models: Invalid API Key (401).");
-         modelSelect.innerHTML = '<option value="">Invalid API Key</option>';
-      } else {
-        console.error(`Failed to fetch models: ${response.status} ${response.statusText}`);
-        modelSelect.innerHTML = `<option value="">API Error ${response.status}</option>`;
-      }
+      // Handle specific errors - removed 401 check as it's not relevant without API key
+      console.error(`Failed to fetch models: ${response.status} ${response.statusText}`);
+      modelSelect.innerHTML = `<option value="">API Error ${response.status}</option>`;
       const errorData = await response.json().catch(() => null);
       console.error("API Error details:", errorData);
       return []; // Return empty on error
@@ -247,11 +237,14 @@ function saveOptions() {
 }
 
 // Restores options using preferences stored in chrome.storage.
-function restoreOptions() {
+async function restoreOptions() { // Made async to await fetchModels
+  // Fetch models immediately on load, before getting stored settings
+  const fetchedModels = await fetchModels(); // Fetch models first
+
   chrome.storage.sync.get(
     { // Defaults
       openRouterApiKey: '',
-      selectedModel: "openai/gpt-4o-mini-search-preview", // Default model
+      selectedModel: DEFAULT_MODEL, // Use constant for default model
       selectedPromptId: DEFAULT_PROMPTS[0]?.id || null, // Default to first prompt ID
       temperature: 0.9, // Default temperature
       timeout: 30, // Default timeout in seconds
@@ -275,13 +268,11 @@ function restoreOptions() {
          verboseLoggingCheckbox.checked = items.verboseLoggingEnabled; // Restore verbose logging state
          currentPrompts = items.prompts; // Use saved or default prompts
 
-         // Fetch models dynamically using the restored API key
-         fetchModels(items.openRouterApiKey).then(fetchedModels => {
-             // Populate UI elements
-             populateModelSelect(fetchedModels, items.selectedModel); // Use fetched models
-             populatePromptList(currentPrompts, items.selectedPromptId);
-             console.log("Settings restored, models fetched (if API key valid).");
-         }); // No catch here, fetchModels handles its own errors internally by updating dropdown
+         // Models are already fetched, now populate the UI
+         populateModelSelect(fetchedModels, items.selectedModel); // Use pre-fetched models
+         populatePromptList(currentPrompts, items.selectedPromptId);
+         console.log("Settings restored, models populated.");
+         // Removed the nested fetchModels call here
 
        }
     }
@@ -475,14 +466,11 @@ saveButton.addEventListener('click', saveOptions);
 clearHistoryButton.addEventListener('click', clearHistory); // Add listener for clear button
 testModelsButton.addEventListener('click', testModelPerformance); // Add listener for model test button
 
-// Add listener to API key input to refresh models on change
-apiKeyInput.addEventListener('change', (event) => {
-    const newApiKey = event.target.value;
-    console.log("API Key changed, attempting to fetch models...");
-    // Fetch models with the new key, but don't change the saved selection yet
-    fetchModels(newApiKey).then(fetchedModels => {
-        // Get the currently selected model value *before* repopulating
-        const previouslySelectedModel = modelSelect.value;
-        populateModelSelect(fetchedModels, previouslySelectedModel); // Try to keep the selection if the model still exists
-    });
-});
+// Add listener to API key input - No longer fetches models on change, as they load initially.
+// This listener might be removed or repurposed later if needed.
+/* apiKeyInput.addEventListener('change', (event) => {
+    // const newApiKey = event.target.value; // API key no longer directly triggers fetch
+    console.log("API Key changed. Note: Models are fetched on page load.");
+    // If a re-fetch button is desired, it could call fetchModels() and repopulate.
+}); */
+// Let's comment out the listener for now as it doesn't fetch models anymore.

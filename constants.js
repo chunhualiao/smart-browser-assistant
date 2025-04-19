@@ -53,4 +53,6 @@ export const DEFAULT_PROMPTS = [
   }
 ];
 
+export const DEFAULT_MODEL = "openai/gpt-4o-mini-search-preview";
+
 // Add other shared constants here if needed in the future
