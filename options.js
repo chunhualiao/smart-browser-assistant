@@ -251,7 +251,7 @@ function restoreOptions() {
   chrome.storage.sync.get(
     { // Defaults
       openRouterApiKey: '',
-      selectedModel: "openai/gpt-3.5-turbo", // Default model
+      selectedModel: "openai/gpt-4o-mini-search-preview", // Default model
       selectedPromptId: DEFAULT_PROMPTS[0]?.id || null, // Default to first prompt ID
       temperature: 0.9, // Default temperature
       timeout: 30, // Default timeout in seconds

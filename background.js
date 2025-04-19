@@ -102,7 +102,7 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
     // The menu doesn't need to be rebuilt here.
     // The onClicked listener fetches the current prompt details dynamically.
     console.log("Prompts changed in storage. Context menu will use updated prompts on next click.");
-    // updateContextMenu(changes.prompts.newValue); // REMOVED: This was likely causing duplicate errors
+    updateContextMenu(changes.prompts.newValue);
   }
 });
 
@@ -114,7 +114,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "testModelPerformance") {
     const { modelId, apiKey } = message;
     if (!modelId || !apiKey) {
-      console.error("Missing modelId or apiKey for testModelPerformance");
+      console.error("Missing required parameters (modelId or apiKey) for testModelPerformance.");
       sendResponse({ success: false, error: "Missing modelId or apiKey" });
       return false; // No async response needed
     }
@@ -142,9 +142,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`,
-        // Add Referer/Title if needed
-        // "HTTP-Referer": chrome.runtime.getURL("options.html"),
-        // "X-Title": "Smart Browser Assistant"
+        "HTTP-Referer": chrome.runtime.getURL("options.html"),
+        "X-Title": "Smart Browser Assistant"
       },
       body: JSON.stringify(requestBody)
     })
@@ -234,9 +233,8 @@ async function generateReply(selectedText, tabId, clickedPrompt) {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${settings.apiKey}`,
-        // Add "HTTP-Referer": "YOUR_SITE_URL" or "X-Title": "YOUR_APP_NAME" if required by OpenRouter for identification
-        // e.g., "HTTP-Referer": chrome.runtime.getURL("options.html"),
-        // e.g., "X-Title": "Smart Browser Assistant"
+        "HTTP-Referer": chrome.runtime.getURL("options.html"),
+        "X-Title": "Smart Browser Assistant"
       },
       body: JSON.stringify(requestBody)
     });

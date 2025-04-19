@@ -17,9 +17,9 @@ export const DEFAULT_PROMPTS = [
     text: "Translate the following text to Simplified Chinese:\n\n\"%TEXT%\""
   },
   {
-    id: "4", // Changed from "prompt_const_amendment"
-    name: "Analyze via Specific Amendment",
-    text: "Analyze the following text through the lens of the [Specify Amendment, e.g., First Amendment] of the US Constitution. Identify potential conflicts or alignments. Keep it concise (under 280 chars):\n\n\"%TEXT%\""
+    id: "4", 
+    name: "Fact and Logic Check with Critical Thinking",
+    text: "Critically analyze the following text through the lengs of a critical thinker. conduct both fact and logic checks:\n\n\"%TEXT%\""
   },
   {
     id: "5", // Changed from "prompt_const_sep_powers"
