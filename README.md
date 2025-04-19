@@ -1,4 +1,4 @@
-# Smart Browser Assistant Chrome Extension (v0.2)
+# Smart Browser Assistant Chrome Extension
 
 This Chrome extension acts as an AI assistant for **any selected text** on a webpage using the OpenRouter API. Some models available through OpenRouter, such as `openai/gpt-4o-mini-preview`, support web search by default, which can be especially useful for tasks like fact-checking posts on X. It adds a context menu item when you right-click on highlighted text, allowing you to perform various actions like generating replies, proofreading, translating, or performing critical analysis. The generated response is copied to your clipboard. It's useful for tasks like drafting social media responses, improving writing, or understanding text from different perspectives.
 
