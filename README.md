@@ -30,8 +30,9 @@ This Chrome extension acts as an AI assistant for **any selected text** on a web
     *   Scroll down and click "Extension options".
     *   Alternatively, click the puzzle piece icon in your Chrome toolbar, find "Smart Browser Assistant", click the three dots next to it, and select "Options".
     *   On the options page:
-        *   Enter your **OpenRouter API Key**. The list of AI models will load dynamically once a valid key is entered (you might need to click out of the field).
-        *   Select the desired **AI Model** from the dropdown. Please note that some thinking or reasoning models may take up to 20 seconds to respond due to their complexity. We ask for your patience when using such models. An example of this is the Gemini Pro 2.5 experimental model.
+        *   The list of **AI Models** will load automatically from OpenRouter.
+        *   Enter your **OpenRouter API Key**. This is required for making API calls when using the context menu.
+        *   Select the desired **AI Model** from the dropdown (defaults to `openai/gpt-4o-mini-search-preview`). Please note that some thinking or reasoning models may take up to 20 seconds to respond due to their complexity. We ask for your patience when using such models. An example of this is the Gemini Pro 2.5 experimental model.
         *   Adjust the **Temperature (Creativity)** setting (0=focused, 1+=creative).
         *   Set the **API Timeout** in seconds (default 30, min 5). This is the maximum time the extension will wait for a response from the API before showing an error.
         *   Choose the **Active Prompt** you want the context menu to use.
@@ -63,7 +64,7 @@ See `doc/developer_deployment.md` for information on deploying this extension to
     *   **Translate to Chinese (Simplified):** Translate the selected text into Simplified Chinese.
     *   **Critical Analysis:** Prompts focused on constitutional analysis and critical thinking (e.g., Analyze via Specific Amendment, Identify Assumptions, Evaluate Evidence, Generate Counter-Argument, Explore Implications, Custom Students/Einstein Analogy).
 *   Allows editing of any prompt text within the options page.
-*   Dynamically loads available models from OpenRouter (requires valid API key).
+*   Dynamically loads available models from OpenRouter automatically on page load (API key is *not* required for loading the list).
 *   Logs generation history (timestamp, model, duration, input, output) locally.
 *   Provides an option to view and clear the generation history.
 *   **Model Performance Testing:** Allows testing the response time of randomly sampled models directly from the options page. 
@@ -109,8 +110,8 @@ A security review of the codebase was performed with the following findings:
 
 *   **Context Menu Not Appearing:** Ensure you are right-clicking *directly on the text you have selected*. Make sure the extension is enabled in `chrome://extensions/`.
 *   **"API Key not set" Error:** Go to the extension options and ensure your OpenRouter API key is entered correctly and saved.
-*   **"Model or Prompt not configured" Error:** Go to the extension options and make sure you have selected a model and a prompt, then save settings.
-*   **Model List Not Loading:** Ensure your OpenRouter API key is entered correctly and is valid. The model list requires a valid key to load. Check the service worker console for errors if it still fails.
-*   **API Errors (e.g., 4xx, 5xx):** Ensure your OpenRouter API key is valid and has credits/correct permissions for the selected model. Check the background script console for specific error messages from the API (go to `chrome://extensions/`, find the extension, click the "Service worker" link, and look at the "Console" tab). The Generation History section might also provide clues about recent attempts.
+*   **"Model or Prompt not configured" Error:** Go to the extension options and make sure you have selected a model and a prompt, then save settings. The default model is `openai/gpt-4o-mini-search-preview`.
+*   **Model List Not Loading:** The model list should load automatically. If it doesn't, check your internet connection and the background script console for errors (go to `chrome://extensions/`, find the extension, click the "Service worker" link, and look at the "Console" tab). An API key is *not* needed for the list to load.
+*   **API Errors (e.g., 4xx, 5xx):** Ensure your OpenRouter API key (entered in options) is valid and has credits/correct permissions for the selected model *when you try to use the context menu*. Check the background script console for specific error messages from the API. The Generation History section might also provide clues about recent attempts.
 *   **Result Not Copied / Other Errors:** Check the background script console for errors related to the API call or clipboard access.
 *   **Viewing Full Generation Details:** Check the Generation History section in the options page for details on past successful generations.
