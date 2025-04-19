@@ -75,7 +75,7 @@ See `doc/developer_deployment.md` for information on deploying this extension to
 2.  **Select (highlight) the text** with your mouse.
 3.  **Right-click** on the highlighted text.
 4.  Hover over the **"Smart Browser Assistant"** item in the context menu.
-5.  A sub-menu will appear listing all available prompts (e.g., "Generate Reply", "Proofread Text", "Analyze via Specific Amendment").
+5.  A sub-menu will appear listing all available prompts (e.g., "Generate Reply", "Proofread Text", "Fact and Logic Check").
 6.  **Click the specific prompt** you want to use for the selected text.
 7.  The extension will send the selected text and the chosen prompt (using your configured model and settings) to OpenRouter.
 8.  Wait for the API to process the request (up to the configured timeout).
